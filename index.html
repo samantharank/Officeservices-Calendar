@@ -24,22 +24,40 @@
   @keyframes spin { to { transform: rotate(360deg); } }
   #loading-msg { font-size: 0.85rem; color: var(--text-muted); }
 
-  header { display: flex; align-items: center; gap: 10px; padding: 11px 18px; background: var(--surface); border-bottom: 2px solid var(--accent); position: sticky; top: 0; z-index: 100; }
-  .logo { font-family: 'DM Serif Display', serif; font-size: 1.25rem; white-space: nowrap; }
+  header { display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: var(--surface); border-bottom: 2px solid var(--accent); position: sticky; top: 0; z-index: 100; flex-wrap: wrap; }
+  .logo { font-family: 'DM Serif Display', serif; font-size: 1.2rem; white-space: nowrap; }
   .logo span { color: var(--accent); font-style: italic; }
-  .nav-controls { display: flex; align-items: center; gap: 6px; margin-left: 6px; }
-  .nav-btn { background: var(--surface2); border: 1px solid var(--accent); color: var(--text); width: 28px; height: 28px; border-radius: 5px; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+  .nav-controls { display: flex; align-items: center; gap: 5px; }
+  .nav-btn { background: var(--surface2); border: 1px solid var(--accent); color: var(--text); width: 27px; height: 27px; border-radius: 5px; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
   .nav-btn:hover { background: var(--accent); }
-  #month-label { font-family: 'DM Serif Display', serif; font-size: 0.98rem; min-width: 145px; text-align: center; }
-  .today-btn { background: var(--surface2); border: 1px solid var(--accent); color: var(--text-muted); padding: 4px 10px; border-radius: 5px; cursor: pointer; font-size: 0.73rem; transition: all 0.15s; }
+  #month-label { font-family: 'DM Serif Display', serif; font-size: 0.95rem; min-width: 140px; text-align: center; }
+  .today-btn { background: var(--surface2); border: 1px solid var(--accent); color: var(--text-muted); padding: 4px 10px; border-radius: 5px; cursor: pointer; font-size: 0.72rem; transition: all 0.15s; }
   .today-btn:hover { background: var(--accent); color: #fff; }
+  .week-btn { background: var(--surface2); border: 1px solid var(--accent); color: var(--text-muted); padding: 4px 10px; border-radius: 5px; cursor: pointer; font-size: 0.72rem; transition: all 0.15s; white-space: nowrap; }
+  .week-btn:hover { background: var(--accent); color: #fff; }
   .view-switcher { display: flex; background: var(--surface2); border: 1px solid var(--accent); border-radius: 5px; overflow: hidden; }
-  .view-btn { background: none; border: none; color: var(--text-muted); padding: 5px 12px; cursor: pointer; font-size: 0.73rem; font-family: 'DM Sans', sans-serif; font-weight: 500; transition: all 0.15s; }
+  .view-btn { background: none; border: none; color: var(--text-muted); padding: 5px 11px; cursor: pointer; font-size: 0.72rem; font-family: 'DM Sans', sans-serif; font-weight: 500; transition: all 0.15s; }
   .view-btn.active { background: var(--accent); color: #fff; font-weight: 600; }
-  .rt-badge { display: flex; align-items: center; gap: 4px; font-size: 0.67rem; color: var(--text-muted); }
+  .rt-badge { display: flex; align-items: center; gap: 4px; font-size: 0.66rem; color: var(--text-muted); }
   .rt-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--holiday); animation: pulse 2s infinite; }
   @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
-  .add-btn { background: var(--accent); color: #fff; border: none; padding: 6px 14px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; font-weight: 600; margin-left: auto; transition: background 0.15s; }
+
+  .search-wrap { position: relative; }
+  .search-input { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 5px 10px 5px 28px; border-radius: 5px; font-family: 'DM Sans', sans-serif; font-size: 0.73rem; width: 160px; transition: border-color 0.15s, width 0.2s; }
+  .search-input:focus { outline: none; border-color: var(--accent); width: 200px; }
+  .search-input::placeholder { color: var(--text-muted); }
+  .search-icon { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-size: 0.7rem; color: var(--text-muted); pointer-events: none; }
+  .search-results { position: absolute; top: calc(100% + 4px); left: 0; right: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; z-index: 300; max-height: 200px; overflow-y: auto; display: none; box-shadow: 0 8px 24px rgba(0,0,0,0.4); min-width: 240px; }
+  .search-results.show { display: block; }
+  .search-result-item { padding: 8px 10px; cursor: pointer; border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  .search-result-item:last-child { border-bottom: none; }
+  .search-result-item:hover { background: var(--surface2); }
+  .sr-name { font-size: 0.78rem; font-weight: 500; }
+  .sr-meta { font-size: 0.65rem; color: var(--text-muted); margin-top: 2px; }
+  .sr-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+  .search-empty { padding: 12px 10px; font-size: 0.75rem; color: var(--text-muted); text-align: center; }
+
+  .add-btn { background: var(--accent); color: #fff; border: none; padding: 6px 13px; border-radius: 5px; cursor: pointer; font-size: 0.78rem; font-weight: 600; margin-left: auto; transition: background 0.15s; }
   .add-btn:hover { background: var(--accent-hover); }
 
   main { display: flex; flex: 1; overflow: hidden; min-height: 0; }
@@ -65,8 +83,6 @@
   .office-item.hidden { opacity: 0.28; }
   .o-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
   .o-name { flex: 1; }
-  .o-count { font-size: 0.6rem; background: var(--surface2); color: var(--text-muted); border-radius: 10px; padding: 1px 6px; min-width: 18px; text-align: center; }
-  .o-count.has-off { background: rgba(243,185,33,0.2); color: var(--team-member); }
 
   .type-list { display: flex; flex-direction: column; gap: 5px; }
   .type-item { display: flex; align-items: flex-start; gap: 6px; padding: 2px 5px; }
@@ -85,8 +101,8 @@
   .wo-name { font-size: 0.75rem; font-weight: 500; }
   .wo-type { font-size: 0.63rem; color: var(--text-muted); margin-top: 1px; }
   .wo-backup { font-size: 0.62rem; color: var(--accent-hover); margin-top: 1px; }
+  .wo-fwd { font-size: 0.62rem; color: var(--team-member); margin-top: 1px; }
   .wo-half { display: inline-block; font-size: 0.49rem; background: var(--half-day); color: #000; border-radius: 2px; padding: 0 3px; font-weight: 700; margin-left: 3px; vertical-align: middle; }
-  .wo-warn { font-size: 0.6rem; color: var(--warning); margin-top: 1px; }
   .day-add-btn { background: none; border: 1px dashed var(--border); color: var(--text-muted); width: 100%; padding: 5px; border-radius: 5px; cursor: pointer; font-size: 0.7rem; font-family: 'DM Sans', sans-serif; margin-top: 5px; transition: all 0.15s; }
   .day-add-btn:hover { border-color: var(--accent); color: var(--accent); }
 
@@ -118,6 +134,8 @@
   .chip-office { font-size: 0.6rem; font-weight: 500; }
   .chip-backup { font-size: 0.59rem; color: var(--accent-hover); }
   .chip-backup::before { content: '↩ '; }
+  .chip-fwd { font-size: 0.59rem; color: var(--team-member); }
+  .chip-fwd::before { content: '📞 '; }
   .more { font-size: 0.59rem; color: var(--text-muted); padding: 1px 4px; cursor: pointer; }
   .more:hover { color: var(--accent); }
 
@@ -136,7 +154,6 @@
   .form-row label .sub { font-weight: 400; text-transform: none; letter-spacing: 0; font-size: 0.65rem; }
   .form-row select, .form-row input { width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 8px 10px; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 0.81rem; appearance: none; transition: border-color 0.15s; }
   .form-row select:focus, .form-row input:focus { outline: none; border-color: var(--accent); }
-  .required-badge { font-size: 0.6rem; background: rgba(243,185,33,0.2); color: var(--team-member); border-radius: 3px; padding: 1px 5px; margin-left: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
   .half-toggle { display: flex; align-items: center; gap: 9px; padding: 8px 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; user-select: none; transition: all 0.15s; }
   .half-toggle:hover { border-color: var(--half-day); }
   .half-toggle.active { border-color: var(--half-day); background: rgba(243,185,33,0.07); }
@@ -156,6 +173,8 @@
     header { padding: 10px 12px; }
     .calendar-wrap { padding: 8px; }
     .day-cell { min-height: 70px; }
+    .week-btn { display: none; }
+    .search-wrap { display: none; }
   }
 </style>
 </head>
@@ -174,12 +193,18 @@
     <span id="month-label"></span>
     <button class="nav-btn" id="next-btn">›</button>
     <button class="today-btn" id="today-btn">Today</button>
+    <button class="week-btn" id="week-btn">📅 This Week</button>
   </div>
   <div class="view-switcher">
     <button class="view-btn active" data-view="month">Month</button>
     <button class="view-btn" data-view="week">Week</button>
   </div>
   <div class="rt-badge"><div class="rt-dot"></div><span>Live</span></div>
+  <div class="search-wrap" id="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" class="search-input" id="search-input" placeholder="Search by name…">
+    <div class="search-results" id="search-results"></div>
+  </div>
   <button class="add-btn" id="add-btn">+ Add Entry</button>
 </header>
 
@@ -216,8 +241,8 @@
           <span>Who's Off</span><span class="sec-arrow open" id="whosoff-arr">▶</span>
         </div>
         <div id="whosoff-content">
-          <div class="whosoff-date" id="wo-date">Click a day to see entries</div>
-          <div id="wo-entries"><div class="whosoff-empty">Select a day on the calendar</div></div>
+          <div class="whosoff-date" id="wo-date">Today</div>
+          <div id="wo-entries"><div class="whosoff-empty">Loading…</div></div>
           <button class="day-add-btn" id="day-add-btn" style="display:none">+ Add Entry for this Day</button>
         </div>
       </div>
@@ -250,6 +275,10 @@
     <div class="form-row" id="backup-row" style="display:none">
       <label>Backup Person <span class="sub">(optional)</span></label>
       <input type="text" id="entry-backup" placeholder="Who covers their calls?">
+    </div>
+    <div class="form-row" id="forward-row" style="display:none">
+      <label>Forward Calls To <span class="sub">(optional)</span></label>
+      <input type="text" id="entry-forward" placeholder="e.g. Sarnia — Amy">
     </div>
     <div class="form-row" id="holiday-row" style="display:none">
       <label>Holiday Name</label>
@@ -319,7 +348,7 @@ let events        = [];
 let hiddenOffices = new Set(JSON.parse(localStorage.getItem('hub_hidden') || '[]'));
 let halfActive    = false;
 let editingId     = null;
-let selectedDay   = null;
+let selectedDay   = todayKey;
 let curView       = 'month';
 
 function fmtD(y,m,d) { return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
@@ -387,20 +416,11 @@ function subscribeRealtime() {
 }
 
 function renderLegend() {
-  const el = document.getElementById('office-legend');
-  el.innerHTML = '';
-  const counts = {};
-  const ws = new Date(weekStart);
-  for (let i = 0; i < 5; i++) {
-    const d = new Date(ws); d.setDate(d.getDate() + i);
-    const dk = fmtD(d.getFullYear(), d.getMonth(), d.getDate());
-    eventsOn(dk).forEach(e => { counts[e.office] = (counts[e.office]||0) + 1; });
-  }
+  const el = document.getElementById('office-legend'); el.innerHTML = '';
   OFFICES.forEach(o => {
     const item = document.createElement('div');
     item.className = 'office-item' + (hiddenOffices.has(o.id) ? ' hidden' : '');
-    const cnt = counts[o.id] || 0;
-    item.innerHTML = `<div class="o-dot" style="background:${o.color}"></div><span class="o-name">${o.name}</span><span class="o-count ${cnt > 0 ? 'has-off' : ''}">${cnt}</span>`;
+    item.innerHTML = `<div class="o-dot" style="background:${o.color}"></div><span class="o-name">${o.name}</span>`;
     item.addEventListener('click', () => {
       hiddenOffices.has(o.id) ? hiddenOffices.delete(o.id) : hiddenOffices.add(o.id);
       localStorage.setItem('hub_hidden', JSON.stringify([...hiddenOffices]));
@@ -479,11 +499,10 @@ function renderWeek() {
 function buildCell(y, m, d, other, fullH) {
   const dk = fmtD(y, m, d);
   const dayEvs = eventsOn(dk);
-  const hasWarn = false;
   const cell = document.createElement('div');
   cell.className = 'day-cell' + (other ? ' other-month' : '') + (dk === todayKey ? ' today' : '') + (dk === selectedDay ? ' selected' : '');
   const numRow = document.createElement('div'); numRow.className = 'day-num';
-  numRow.innerHTML = `<span>${d}</span>${hasWarn ? '<span title="Missing backup">⚠️</span>' : ''}`;
+  numRow.innerHTML = `<span>${d}</span>`;
   cell.appendChild(numRow);
   const MAX = fullH ? 8 : 4;
   dayEvs.slice(0, MAX).forEach(ev => cell.appendChild(buildChip(ev)));
@@ -498,8 +517,7 @@ function buildChip(ev) {
   const office = OFFICES.find(o => o.id === ev.office);
   const tColor = TYPE_COLOR[ev.entry_type] || '#888';
   const oColor = office ? office.color : '#555';
-  const chip = document.createElement('div');
-  chip.className = 'chip'; chip.dataset.evid = ev.id;
+  const chip = document.createElement('div'); chip.className = 'chip'; chip.dataset.evid = ev.id;
   chip.style.borderLeftColor = ev.entry_type === 'holiday' ? tColor : oColor;
   chip.style.color = tColor;
   const r1 = document.createElement('div'); r1.className = 'chip-row1';
@@ -515,6 +533,7 @@ function buildChip(ev) {
   } else if (office) {
     r2.innerHTML = `<span class="chip-office" style="color:${oColor}">${office.name}</span>`;
     if (ev.backup) r2.innerHTML += `<span class="chip-backup">${ev.backup}</span>`;
+    if (ev.forward_to) r2.innerHTML += `<span class="chip-fwd">${ev.forward_to}</span>`;
   }
   chip.appendChild(r2);
   return chip;
@@ -558,11 +577,50 @@ function makeWOEntry(ev, color) {
     <div class="wo-name">${ev.entry_type === 'holiday' ? (ev.holiday_name||'Holiday') : (ev.entry_name||TYPE_LABEL[ev.entry_type])}${ev.half_day ? '<span class="wo-half">½</span>' : ''}</div>
     <div class="wo-type">${TYPE_LABEL[ev.entry_type]}${ev.note ? ' · '+ev.note : ''}</div>
     ${ev.backup ? `<div class="wo-backup">↩ Backup: ${ev.backup}</div>` : ''}
+    ${ev.forward_to ? `<div class="wo-fwd">📞 Fwd to: ${ev.forward_to}</div>` : ''}
   </div>`;
   row.addEventListener('click', () => openEdit(ev.id));
   return row;
 }
 
+// ── Search ────────────────────────────────────────────────────
+document.getElementById('search-input').addEventListener('input', function() {
+  const q = this.value.trim().toLowerCase();
+  const results = document.getElementById('search-results');
+  if (!q) { results.classList.remove('show'); return; }
+  const matches = events.filter(e => (e.entry_name || e.holiday_name || '').toLowerCase().includes(q));
+  results.innerHTML = '';
+  if (!matches.length) {
+    results.innerHTML = '<div class="search-empty">No results found</div>';
+  } else {
+    matches.slice(0, 8).forEach(ev => {
+      const office = OFFICES.find(o => o.id === ev.office);
+      const color = TYPE_COLOR[ev.entry_type] || '#888';
+      const oColor = office ? office.color : '#888';
+      const item = document.createElement('div'); item.className = 'search-result-item';
+      item.innerHTML = `
+        <div class="sr-name"><span class="sr-dot" style="background:${color}"></span>${ev.entry_type === 'holiday' ? (ev.holiday_name||'Holiday') : (ev.entry_name||'')}</div>
+        <div class="sr-meta"><span style="color:${oColor}">${office ? office.name : 'All Offices'}</span> · ${TYPE_LABEL[ev.entry_type]} · ${ev.entry_date}</div>`;
+      item.addEventListener('click', () => {
+        const [y,m,d] = ev.entry_date.split('-').map(Number);
+        curYear = y; curMonth = m-1;
+        results.classList.remove('show');
+        document.getElementById('search-input').value = '';
+        renderView();
+        setTimeout(() => selectDay(ev.entry_date, y, m-1, d), 50);
+      });
+      results.appendChild(item);
+    });
+  }
+  results.classList.add('show');
+});
+
+document.addEventListener('click', e => {
+  if (!document.getElementById('search-wrap').contains(e.target))
+    document.getElementById('search-results').classList.remove('show');
+});
+
+// ── Modal ─────────────────────────────────────────────────────
 function closeAll() { document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('open')); }
 function setHalf(val) { halfActive = val; document.getElementById('half-toggle').classList.toggle('active', val); }
 
@@ -571,6 +629,7 @@ function syncForm() {
   const isHol = type === 'holiday', isEmp = type === 'employee-off';
   document.getElementById('name-row').style.display    = isHol ? 'none' : '';
   document.getElementById('backup-row').style.display  = isEmp ? '' : 'none';
+  document.getElementById('forward-row').style.display = isEmp ? '' : 'none';
   document.getElementById('holiday-row').style.display = isHol ? '' : 'none';
   document.getElementById('office-row').style.display  = isHol ? 'none' : '';
   document.getElementById('name-lbl').textContent = type === 'team-member' ? 'Team Member Name' : 'Employee Name';
@@ -584,6 +643,7 @@ function openAdd(prefillDate) {
   document.getElementById('entry-office').value = OFFICES[0].id;
   document.getElementById('entry-name').value = '';
   document.getElementById('entry-backup').value = '';
+  document.getElementById('entry-forward').value = '';
   document.getElementById('entry-holiday-name').value = '';
   document.getElementById('entry-date').value = prefillDate;
   document.getElementById('entry-end-date').value = '';
@@ -603,6 +663,7 @@ function openEdit(evId) {
   document.getElementById('entry-office').value = ev.office || OFFICES[0].id;
   document.getElementById('entry-name').value = ev.entry_name || '';
   document.getElementById('entry-backup').value = ev.backup || '';
+  document.getElementById('entry-forward').value = ev.forward_to || '';
   document.getElementById('entry-holiday-name').value = ev.holiday_name || '';
   document.getElementById('entry-date').value = ev.entry_date || '';
   document.getElementById('entry-end-date').value = ev.end_date || '';
@@ -622,15 +683,16 @@ document.getElementById('save-btn').addEventListener('click', async () => {
   const date = document.getElementById('entry-date').value;
   if (!date) { alert('Please select a date.'); return; }
   const payload = {
-    entry_type: type,
-    office: type === 'holiday' ? 'all' : document.getElementById('entry-office').value,
-    entry_date: date,
-    end_date: document.getElementById('entry-end-date').value || null,
-    entry_name: type !== 'holiday' ? document.getElementById('entry-name').value.trim() : null,
+    entry_type:   type,
+    office:       type === 'holiday' ? 'all' : document.getElementById('entry-office').value,
+    entry_date:   date,
+    end_date:     document.getElementById('entry-end-date').value || null,
+    entry_name:   type !== 'holiday' ? document.getElementById('entry-name').value.trim() : null,
     holiday_name: type === 'holiday' ? document.getElementById('entry-holiday-name').value.trim() : null,
-    backup: type === 'employee-off' ? document.getElementById('entry-backup').value.trim() || null : null,
-    half_day: halfActive,
-    note: document.getElementById('entry-note').value.trim() || null,
+    backup:       type === 'employee-off' ? document.getElementById('entry-backup').value.trim() || null : null,
+    forward_to:   type === 'employee-off' ? document.getElementById('entry-forward').value.trim() || null : null,
+    half_day:     halfActive,
+    note:         document.getElementById('entry-note').value.trim() || null,
   };
   document.getElementById('save-btn').disabled = true;
   showSaving('Saving…'); closeAll();
@@ -652,6 +714,7 @@ document.getElementById('del-btn').addEventListener('click', async () => {
 
 document.getElementById('cancel-btn').addEventListener('click', closeAll);
 document.querySelectorAll('.modal-overlay').forEach(ov => ov.addEventListener('click', e => { if (e.target === ov) closeAll(); }));
+document.getElementById('add-btn').addEventListener('click', () => openAdd());
 
 document.getElementById('prev-btn').addEventListener('click', () => {
   if (curView === 'week') { weekStart = new Date(weekStart); weekStart.setDate(weekStart.getDate() - 7); }
@@ -664,7 +727,15 @@ document.getElementById('next-btn').addEventListener('click', () => {
   renderView();
 });
 document.getElementById('today-btn').addEventListener('click', () => {
-  curYear = today.getFullYear(); curMonth = today.getMonth(); weekStart = getMondayOf(today); renderView();
+  curYear = today.getFullYear(); curMonth = today.getMonth();
+  weekStart = getMondayOf(today); renderView();
+  selectDay(todayKey, today.getFullYear(), today.getMonth(), today.getDate());
+});
+document.getElementById('week-btn').addEventListener('click', () => {
+  weekStart = getMondayOf(today); curView = 'week';
+  document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+  document.querySelector('[data-view="week"]').classList.add('active');
+  renderView();
 });
 document.querySelectorAll('.view-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -672,16 +743,20 @@ document.querySelectorAll('.view-btn').forEach(btn => {
     btn.classList.add('active'); curView = btn.dataset.view; renderView();
   });
 });
-document.getElementById('add-btn').addEventListener('click', () => openAdd());
 
 (async () => {
   try {
     document.getElementById('loading-msg').textContent = 'Loading calendar…';
     await loadEvents();
     populateOfficeSelect();
+    renderLegend();
     renderView();
     subscribeRealtime();
     document.getElementById('loading-overlay').style.display = 'none';
+    // Auto-load today's Who's Off
+    selectDay(todayKey, today.getFullYear(), today.getMonth(), today.getDate());
+    document.getElementById('day-add-btn').style.display = '';
+    document.getElementById('day-add-btn').onclick = () => openAdd(todayKey);
   } catch (err) {
     console.error(err);
     document.getElementById('loading-msg').textContent = 'Failed to connect. Please refresh and try again.';
