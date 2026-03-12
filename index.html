@@ -176,8 +176,8 @@
     <button class="today-btn" id="today-btn">Today</button>
   </div>
   <div class="view-switcher">
-    <button class="view-btn" data-view="month">Month</button>
-    <button class="view-btn active" data-view="week">Week</button>
+    <button class="view-btn active" data-view="month">Month</button>
+    <button class="view-btn" data-view="week">Week</button>
   </div>
   <div class="rt-badge"><div class="rt-dot"></div><span>Live</span></div>
   <button class="add-btn" id="add-btn">+ Add Entry</button>
@@ -320,7 +320,7 @@ let hiddenOffices = new Set(JSON.parse(localStorage.getItem('hub_hidden') || '[]
 let halfActive    = false;
 let editingId     = null;
 let selectedDay   = null;
-let curView       = 'week';
+let curView       = 'month';
 
 function fmtD(y,m,d) { return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
 
@@ -479,7 +479,7 @@ function renderWeek() {
 function buildCell(y, m, d, other, fullH) {
   const dk = fmtD(y, m, d);
   const dayEvs = eventsOn(dk);
-  const hasWarn = dayEvs.some(e => e.entry_type === 'employee-off' && !e.backup);
+  const hasWarn = false;
   const cell = document.createElement('div');
   cell.className = 'day-cell' + (other ? ' other-month' : '') + (dk === todayKey ? ' today' : '') + (dk === selectedDay ? ' selected' : '');
   const numRow = document.createElement('div'); numRow.className = 'day-num';
@@ -508,7 +508,6 @@ function buildChip(ev) {
   nm.textContent = ev.entry_type === 'holiday' ? (ev.holiday_name || 'Holiday') : (ev.entry_name || TYPE_LABEL[ev.entry_type]);
   r1.appendChild(nm);
   if (ev.half_day) r1.innerHTML += `<span class="chip-half">½</span>`;
-  if (ev.entry_type === 'employee-off' && !ev.backup) r1.innerHTML += `<span title="No backup">⚠️</span>`;
   chip.appendChild(r1);
   const r2 = document.createElement('div'); r2.className = 'chip-row2';
   if (ev.entry_type === 'holiday') {
@@ -559,7 +558,6 @@ function makeWOEntry(ev, color) {
     <div class="wo-name">${ev.entry_type === 'holiday' ? (ev.holiday_name||'Holiday') : (ev.entry_name||TYPE_LABEL[ev.entry_type])}${ev.half_day ? '<span class="wo-half">½</span>' : ''}</div>
     <div class="wo-type">${TYPE_LABEL[ev.entry_type]}${ev.note ? ' · '+ev.note : ''}</div>
     ${ev.backup ? `<div class="wo-backup">↩ Backup: ${ev.backup}</div>` : ''}
-    ${ev.entry_type === 'employee-off' && !ev.backup ? `<div class="wo-warn">⚠️ No backup assigned</div>` : ''}
   </div>`;
   row.addEventListener('click', () => openEdit(ev.id));
   return row;
