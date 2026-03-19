@@ -45,7 +45,6 @@
   .search-input { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 5px 10px 5px 28px; border-radius: 5px; font-family: 'DM Sans', sans-serif; font-size: 0.73rem; width: 160px; transition: border-color 0.15s, width 0.2s; }
   .search-input:focus { outline: none; border-color: var(--accent); width: 200px; }
   .search-input::placeholder { color: var(--text-muted); }
-  .search-icon { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-size: 0.7rem; color: var(--text-muted); pointer-events: none; }
   .search-results { position: absolute; top: calc(100% + 4px); left: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; z-index: 300; max-height: 200px; overflow-y: auto; display: none; box-shadow: 0 8px 24px rgba(0,0,0,0.4); min-width: 240px; }
   .search-results.show { display: block; }
   .search-result-item { padding: 8px 10px; cursor: pointer; border-bottom: 1px solid var(--border); transition: background 0.1s; }
@@ -102,7 +101,6 @@
   .day-add-btn { background: none; border: 1px dashed var(--border); color: var(--text-muted); width: 100%; padding: 5px; border-radius: 5px; cursor: pointer; font-size: 0.7rem; font-family: 'DM Sans', sans-serif; margin-top: 5px; transition: all 0.15s; }
   .day-add-btn:hover { border-color: var(--accent); color: var(--accent); }
 
-  /* ── Month view with spanning events ── */
   .calendar-wrap { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; }
   .calendar-wrap.week-mode { overflow: hidden; }
 
@@ -134,7 +132,6 @@
   .more { font-size: 0.59rem; color: var(--text-muted); padding: 1px 4px; cursor: pointer; }
   .more:hover { color: var(--accent); }
 
-  /* Week view */
   .week-wrap { display: flex; flex-direction: column; height: 100%; }
   .week-hdrs { display: grid; grid-template-columns: repeat(5,1fr); gap: 4px; }
   .week-grid { flex: 1; display: grid; grid-template-columns: repeat(5,1fr); gap: 4px; min-height: 0; }
@@ -152,9 +149,9 @@
   .wc-row2 { display: flex; align-items: center; gap: 4px; margin-top: 1px; padding-left: 9px; flex-wrap: wrap; }
   .wc-office { font-size: 0.6rem; font-weight: 500; }
   .wc-backup { font-size: 0.59rem; color: var(--accent-hover); }
-  .wc-backup::before { content: '↩ '; }
+  .wc-backup::before { content: \'↩ \'; }
   .wc-fwd { font-size: 0.59rem; color: var(--team-member); }
-  .wc-fwd::before { content: '📞 '; }
+  .wc-fwd::before { content: \'📞 \'; }
 
   .saving-indicator { position: fixed; bottom: 18px; right: 18px; background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; padding: 7px 13px; font-size: 0.75rem; color: var(--text-muted); display: none; align-items: center; gap: 7px; z-index: 150; }
   .saving-indicator.show { display: flex; }
@@ -175,7 +172,7 @@
   .half-toggle:hover { border-color: var(--half-day); }
   .half-toggle.active { border-color: var(--half-day); background: rgba(243,185,33,0.07); }
   .tog-sw { width: 28px; height: 16px; background: var(--border); border-radius: 8px; position: relative; transition: background 0.2s; flex-shrink: 0; }
-  .tog-sw::after { content: ''; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--text-muted); transition: transform 0.2s, background 0.2s; }
+  .tog-sw::after { content: \'\'; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--text-muted); transition: transform 0.2s, background 0.2s; }
   .half-toggle.active .tog-sw { background: var(--half-day); }
   .half-toggle.active .tog-sw::after { transform: translateX(12px); background: #000; }
   .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 15px; }
@@ -292,7 +289,7 @@
       <input type="date" id="entry-date">
     </div>
     <div class="form-row">
-      <label>End Date <span class="sub">(optional — multi-day)</span></label>
+      <label>End Date <span class="sub">(optional — leave blank for single day)</span></label>
       <input type="date" id="entry-end-date">
     </div>
     <div class="form-row">
@@ -361,10 +358,15 @@ function hexToRgb(hex) { return `${parseInt(hex.slice(1,3),16)},${parseInt(hex.s
 function eventsOn(dk) {
   return events.filter(e => {
     if (!e.entry_type) return false;
-    if (e.entry_type === 'holiday' && e.office === 'all') { const end = e.end_date || e.entry_date; return dk >= e.entry_date && dk <= end; }
+    if (e.entry_type === 'holiday' && e.office === 'all') {
+      const end = e.end_date || e.entry_date;
+      return dk >= e.entry_date && dk <= end;
+    }
     if (hiddenOffices.has(e.office)) return false;
-    const end = e.end_date || e.entry_date;
-    return dk >= e.entry_date && dk <= end;
+    // No end_date = single day entry only
+    if (!e.end_date) return dk === e.entry_date;
+    // With end_date = show across the full date range
+    return dk >= e.entry_date && dk <= e.end_date;
   });
 }
 
@@ -428,7 +430,6 @@ function updateLabel() {
   }
 }
 
-// ── Month view with spanning events ──────────────────────────
 function renderMonth() {
   const wrap = document.getElementById('cal-wrap'); wrap.innerHTML = ''; wrap.classList.remove('week-mode');
   const cal = document.createElement('div'); cal.className = 'cal-month';
@@ -476,7 +477,8 @@ function buildWeekEvents(weekDates) {
   const weekEvents = events.filter(e => {
     if (!e.entry_type) return false;
     if (hiddenOffices.has(e.office) && !(e.entry_type === 'holiday' && e.office === 'all')) return false;
-    const es = e.entry_date, ee = e.end_date || e.entry_date;
+    const es = e.entry_date;
+    const ee = e.end_date || e.entry_date;
     return es <= weekEnd && ee >= weekStart;
   }).sort((a,b) => {
     const aLen = (new Date(a.end_date||a.entry_date) - new Date(a.entry_date)) / 86400000;
@@ -511,17 +513,13 @@ function buildWeekEvents(weekDates) {
     const displayName = ev.entry_type === 'holiday' ? (ev.holiday_name||'Holiday') : (ev.entry_name||TYPE_LABEL[ev.entry_type]);
     chip.innerHTML = `<div class="chip-dot" style="background:${tColor}"></div><span class="chip-name">${displayName}</span>${ev.half_day?'<span class="chip-half">½</span>':''}${span===1&&office?`<span class="chip-office-tag" style="color:${oColor}">${office.name}</span>`:''}`;
 
-    chip.addEventListener('click', e => {
-      e.stopPropagation();
-      openEdit(ev.id);
-    });
+    chip.addEventListener('click', e => { e.stopPropagation(); openEdit(ev.id); });
     overlay.appendChild(chip);
     for (let i = startCol; i <= endCol; i++) slots[i] = slotRow + 1;
   });
   return overlay;
 }
 
-// ── Week view ─────────────────────────────────────────────────
 function renderWeek() {
   const wrap = document.getElementById('cal-wrap'); wrap.innerHTML = ''; wrap.classList.add('week-mode');
   const ww = document.createElement('div'); ww.className = 'week-wrap';
@@ -567,7 +565,6 @@ function buildWeekChip(ev) {
   return chip;
 }
 
-// ── Who's Off panel ───────────────────────────────────────────
 function selectDay(dk, y, m, d) {
   selectedDay = dk; renderView();
   document.getElementById('wo-date').textContent = new Date(y,m,d).toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric'});
@@ -607,7 +604,6 @@ function makeWOEntry(ev,color) {
   row.addEventListener('click',()=>openEdit(ev.id)); return row;
 }
 
-// ── Search ────────────────────────────────────────────────────
 document.getElementById('search-input').addEventListener('input', function() {
   const q = this.value.trim().toLowerCase(), results = document.getElementById('search-results');
   if (!q) { results.classList.remove('show'); return; }
@@ -625,7 +621,6 @@ document.getElementById('search-input').addEventListener('input', function() {
 });
 document.addEventListener('click', e => { if (!document.getElementById('search-wrap').contains(e.target)) document.getElementById('search-results').classList.remove('show'); });
 
-// ── Modal ─────────────────────────────────────────────────────
 function closeAll() { document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('open')); }
 function setHalf(val) { halfActive=val; document.getElementById('half-toggle').classList.toggle('active',val); }
 
