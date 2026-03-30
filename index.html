@@ -3,1086 +3,817 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="icon" type="image/x-icon" href="favicon.ico">
-<title>The HUB Social Recipe Swap</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<title>HUB Office Services Calendar</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root {
-    --classic-blue: #263746;
-    --electric-blue: #0678d5;
-    --gold: #f3b921;
-    --green: #3ebd3e;
-    --red: #ac1534;
-    --charcoal: #757584;
-    --classic-dark: #18252d;
-    --arctic-gray: #e3e3e3;
-    --white: #ffffff;
+    --bg: #18252d; --surface: #263746; --surface2: #2e4559; --border: #334d63;
+    --text: #ffffff; --text-muted: #a8bdc8; --accent: #0678d5; --accent-hover: #00aeef;
+    --team-member: #f3b921; --employee-off: #00aeef; --holiday: #3ebd3e;
+    --half-day: #f3b921; --warning: #ff6b6b; --panel-width: 230px;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'DM Sans', Arial, sans-serif; background: var(--classic-dark); color: var(--white); min-height: 100vh; }
 
-  /* HEADER */
-  header { background: var(--classic-blue); border-bottom: 4px solid var(--gold); padding: 0 40px; display: flex; align-items: center; justify-content: space-between; height: 72px; position: sticky; top: 0; z-index: 100; }
-  .logo-area { display: flex; align-items: center; gap: 16px; }
-  .hub-logo { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 28px; color: var(--white); letter-spacing: -1px; }
-  .hub-logo span { color: var(--gold); }
-  .header-title { font-size: 13px; font-weight: 500; color: var(--arctic-gray); letter-spacing: 2px; text-transform: uppercase; padding-left: 16px; border-left: 1px solid rgba(255,255,255,0.2); }
-  .header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-  .header-badge { background: var(--gold); color: var(--classic-dark); font-weight: 700; font-size: 12px; padding: 6px 14px; border-radius: 20px; letter-spacing: 1px; text-transform: uppercase; }
-  .user-pill { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15); color: var(--white); font-size: 13px; font-weight: 500; padding: 6px 14px; border-radius: 20px; }
-  .btn-sm { background: transparent; border: 1px solid rgba(255,255,255,0.25); color: rgba(255,255,255,0.7); font-size: 12px; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
-  .btn-sm:hover { border-color: var(--white); color: var(--white); }
-  .btn-sm.danger:hover { border-color: var(--red); color: var(--red); }
-  .admin-btn { background: var(--gold); color: var(--classic-dark); border: none; font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.2s; }
-  .admin-btn:hover { background: #e0a80d; }
+  /* Custom scrollbars */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); border-radius: 10px; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+  * { scrollbar-width: thin; scrollbar-color: var(--border) var(--bg); }
+  html, body { height: 100%; overflow: hidden; }
+  body { background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; display: flex; flex-direction: column; }
 
-  /* HERO */
-  .hero { background: linear-gradient(135deg, var(--classic-blue) 0%, var(--classic-dark) 60%); padding: 60px 40px 50px; position: relative; overflow: hidden; }
-  .hero::before { content: ''; position: absolute; top: -80px; right: -80px; width: 360px; height: 360px; background: radial-gradient(circle, rgba(6,120,213,0.18) 0%, transparent 70%); border-radius: 50%; }
-  .hero::after { content: ''; position: absolute; bottom: -60px; left: 30%; width: 240px; height: 240px; background: radial-gradient(circle, rgba(243,185,33,0.1) 0%, transparent 70%); border-radius: 50%; }
-  .hero-inner { max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
-  .month-pill { display: inline-block; background: rgba(243,185,33,0.15); border: 1px solid var(--gold); color: var(--gold); font-size: 12px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; padding: 5px 14px; border-radius: 20px; margin-bottom: 18px; }
-  .hero h1 { font-family: 'Playfair Display', serif; font-size: clamp(36px, 5vw, 60px); font-weight: 900; line-height: 1.1; margin-bottom: 16px; }
-  .hero h1 em { color: var(--electric-blue); font-style: normal; }
-  .hero p { font-size: 17px; color: rgba(255,255,255,0.7); max-width: 540px; line-height: 1.6; margin-bottom: 32px; }
-  .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; }
-  .btn-primary { background: var(--electric-blue); color: var(--white); border: none; padding: 14px 28px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 600; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 8px; }
-  .btn-primary:hover { background: #0560b0; transform: translateY(-1px); }
-  .btn-ghost { background: transparent; color: var(--white); border: 1px solid rgba(255,255,255,0.3); padding: 14px 28px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; transition: all 0.2s; }
-  .btn-ghost:hover { border-color: var(--white); background: rgba(255,255,255,0.05); }
-
-  /* THEME STRIP */
-  .theme-strip { background: var(--electric-blue); padding: 20px 40px; }
-  .theme-strip-inner { max-width: 1100px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap; }
-  .theme-icon { font-size: 32px; }
-  .theme-current { display: flex; align-items: center; gap: 16px; }
-  .theme-next { display: flex; align-items: center; gap: 12px; background: rgba(0,0,0,0.15); border-radius: 10px; padding: 10px 18px; }
-  .theme-next-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; opacity: 0.7; margin-bottom: 3px; }
-  .theme-next-name { font-size: 15px; font-weight: 700; }
-  .theme-next-icon { font-size: 26px; }
-  .theme-text strong { font-size: 18px; font-weight: 700; display: block; }
-  .theme-text span { font-size: 14px; opacity: 0.85; }
-
-  /* TOP 20 BANNER */
-  .top20-banner { background: linear-gradient(135deg, #1a1a2e, #16213e); border-top: 3px solid var(--gold); border-bottom: 3px solid var(--gold); padding: 40px; }
-  .top20-inner { max-width: 1100px; margin: 0 auto; }
-  .top20-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
-  .top20-head h3 { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; }
-  .top20-head h3 span { color: var(--gold); }
-  .top20-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
-  .top20-card { background: rgba(255,255,255,0.05); border: 1px solid rgba(243,185,33,0.2); border-radius: 12px; overflow: hidden; cursor: pointer; transition: transform 0.2s, border-color 0.2s; }
-  .top20-card:hover { transform: translateY(-3px); border-color: var(--gold); }
-  .top20-img { width: 100%; height: 120px; background: var(--classic-dark); display: flex; align-items: center; justify-content: center; font-size: 36px; position: relative; overflow: hidden; }
-  .top20-img img { width: 100%; height: 100%; object-fit: cover; }
-  .top20-rank { position: absolute; top: 7px; left: 7px; background: var(--gold); color: var(--classic-dark); font-size: 10px; font-weight: 800; padding: 2px 8px; border-radius: 8px; }
-  .top20-info { padding: 12px; }
-  .top20-name { font-family: 'Playfair Display', serif; font-size: 14px; font-weight: 700; margin-bottom: 3px; line-height: 1.3; }
-  .top20-by { font-size: 11px; color: rgba(255,255,255,0.5); }
-
-  /* MAIN */
-  main { max-width: 1100px; margin: 0 auto; padding: 50px 40px; }
-  .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 28px; }
-  .section-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 700; }
-  .section-title span { color: var(--gold); }
-  .recipe-count { background: rgba(255,255,255,0.08); padding: 6px 14px; border-radius: 20px; font-size: 13px; color: var(--arctic-gray); }
-  .past-months-btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: rgba(255,255,255,0.7); font-size: 13px; font-weight: 600; padding: 6px 14px; border-radius: 20px; cursor: pointer; font-family: "DM Sans", sans-serif; transition: all 0.2s; }
-  .past-months-btn:hover { background: rgba(255,255,255,0.12); color: var(--white); border-color: rgba(255,255,255,0.3); }
-  .past-months-btn.active { background: var(--electric-blue); border-color: var(--electric-blue); color: var(--white); }
-  .month-pill-btn { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); font-size: 13px; font-weight: 600; padding: 7px 16px; border-radius: 20px; cursor: pointer; font-family: "DM Sans", sans-serif; transition: all 0.2s; white-space: nowrap; }
-  .month-pill-btn:hover { background: rgba(255,255,255,0.1); color: var(--white); }
-  .month-pill-btn.active { background: var(--electric-blue); border-color: var(--electric-blue); color: var(--white); }
-
-  /* RECIPE GRID */
-  .recipe-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; }
-  .recipe-card { background: var(--classic-blue); border-radius: 14px; overflow: hidden; border: 1px solid rgba(255,255,255,0.06); transition: transform 0.2s, box-shadow 0.2s; cursor: pointer; }
-  .recipe-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.4); border-color: rgba(6,120,213,0.3); }
-  .card-image { width: 100%; height: 190px; background: linear-gradient(135deg, var(--classic-dark), var(--charcoal)); display: flex; align-items: center; justify-content: center; font-size: 52px; overflow: hidden; }
-  .card-image img { width: 100%; height: 100%; object-fit: cover; }
-  .card-body { padding: 20px; }
-  .card-meta { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; flex-wrap: wrap; }
-  .tag { font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; padding: 3px 9px; border-radius: 10px; }
-  .tag-dept { background: rgba(6,120,213,0.2); color: var(--electric-blue); }
-  .tag-office { background: rgba(243,185,33,0.15); color: var(--gold); }
-  .tag-mine { background: rgba(62,189,62,0.12); color: var(--green); border: 1px solid rgba(62,189,62,0.3); }
-  .tag-top20 { background: rgba(243,185,33,0.12); color: var(--gold); border: 1px solid rgba(243,185,33,0.3); }
-  .card-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; margin-bottom: 6px; line-height: 1.3; }
-  .card-author { font-size: 13px; color: rgba(255,255,255,0.55); margin-bottom: 8px; }
-  .card-origin { font-size: 13px; color: rgba(255,255,255,0.7); line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-  .card-footer { padding: 12px 20px; border-top: 1px solid rgba(255,255,255,0.06); display: flex; align-items: center; justify-content: space-between; }
-  .comment-count { font-size: 13px; color: rgba(255,255,255,0.5); }
-  .view-btn { font-size: 13px; color: var(--electric-blue); font-weight: 600; cursor: pointer; background: none; border: none; font-family: 'DM Sans', sans-serif; }
-
-  /* EMPTY */
-  .empty-state { text-align: center; padding: 80px 20px; grid-column: 1 / -1; }
-  .empty-state .emoji { font-size: 64px; margin-bottom: 20px; }
-  .empty-state h3 { font-family: 'Playfair Display', serif; font-size: 24px; margin-bottom: 10px; }
-  .empty-state p { color: rgba(255,255,255,0.5); font-size: 15px; }
-
-  /* HALL OF FAME */
-  .hof-outer { max-width: 1100px; margin: 0 auto; padding: 20px 40px 60px; border-top: 1px solid rgba(255,255,255,0.06); }
-  .hof-outer h2 { font-family: 'Playfair Display', serif; font-size: 32px; font-weight: 900; margin-bottom: 32px; }
-  .hof-outer h2 span { color: var(--gold); }
-  .hof-month { margin-bottom: 44px; }
-  .hof-month-title { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 700; margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.08); }
-  .hof-month-title span { color: var(--gold); font-size: 15px; font-weight: 400; }
-  .hof-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(175px, 1fr)); gap: 12px; }
-  .hof-card { background: var(--classic-blue); border-radius: 10px; overflow: hidden; border: 1px solid rgba(243,185,33,0.15); cursor: pointer; transition: transform 0.2s, border-color 0.2s; }
-  .hof-card:hover { transform: translateY(-3px); border-color: var(--gold); }
-  .hof-img { width: 100%; height: 110px; background: var(--classic-dark); display: flex; align-items: center; justify-content: center; font-size: 30px; position: relative; overflow: hidden; }
-  .hof-img img { width: 100%; height: 100%; object-fit: cover; }
-  .hof-rank { position: absolute; top: 6px; left: 6px; background: var(--gold); color: var(--classic-dark); font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 8px; }
-  .hof-info { padding: 10px 12px; }
-  .hof-name { font-size: 13px; font-weight: 700; margin-bottom: 3px; line-height: 1.3; }
-  .hof-by { font-size: 11px; color: rgba(255,255,255,0.45); }
-
-  /* MODALS */
-  .modal-backdrop { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.78); z-index: 200; overflow-y: auto; padding: 30px 20px; align-items: flex-start; justify-content: center; }
-  .modal-backdrop.open { display: flex; }
-  @keyframes slideUp { from { opacity:0; transform:translateY(28px); } to { opacity:1; transform:translateY(0); } }
-
-  /* SIGN IN */
-  .signin-box { background: var(--classic-blue); border-radius: 16px; width: 100%; max-width: 440px; border: 1px solid rgba(255,255,255,0.1); animation: slideUp 0.3s ease; padding: 40px; text-align: center; position: relative; }
-  .signin-box .icon { font-size: 52px; margin-bottom: 16px; }
-  .signin-box h2 { font-family: 'Playfair Display', serif; font-size: 26px; margin-bottom: 8px; }
-  .signin-box p { color: rgba(255,255,255,0.55); font-size: 14px; margin-bottom: 24px; line-height: 1.6; }
-  .signin-input { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15); border-radius: 10px; padding: 13px 16px; color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 15px; width: 100%; margin-bottom: 12px; transition: border-color 0.2s; }
-  .signin-input:focus { outline: none; border-color: var(--electric-blue); }
-  .signin-input::placeholder { color: rgba(255,255,255,0.3); }
-  .signin-btn { width: 100%; background: var(--electric-blue); color: var(--white); border: none; padding: 14px; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
-  .signin-btn:hover { background: #0560b0; }
-  .signin-note { font-size: 12px; color: rgba(255,255,255,0.3); margin-top: 12px; }
-  .abs-close { position: absolute; top: 14px; right: 14px; background: rgba(255,255,255,0.08); border: none; color: var(--white); width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
-  .abs-close:hover { background: rgba(255,255,255,0.15); }
-
-  /* SUBMIT MODAL */
-  .submit-box { background: var(--classic-blue); border-radius: 16px; width: 100%; max-width: 680px; border: 1px solid rgba(255,255,255,0.1); animation: slideUp 0.3s ease; }
-  .box-header { padding: 26px 30px 0; display: flex; align-items: flex-start; justify-content: space-between; }
-  .box-header h2 { font-family: 'Playfair Display', serif; font-size: 24px; font-weight: 700; }
-  .box-header p { color: rgba(255,255,255,0.55); font-size: 14px; margin-top: 4px; }
-  .box-body { padding: 22px 30px 30px; }
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-  .form-full { grid-column: 1/-1; }
-  .form-group { display: flex; flex-direction: column; gap: 5px; }
-  .form-group label { font-size: 12px; font-weight: 600; letter-spacing: 0.5px; color: rgba(255,255,255,0.7); text-transform: uppercase; }
-  .req { color: var(--gold); }
-  .form-control { background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 8px; padding: 11px 13px; color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 14px; width: 100%; transition: border-color 0.2s; }
-  .form-control:focus { outline: none; border-color: var(--electric-blue); background: rgba(6,120,213,0.07); }
-  .form-control::placeholder { color: rgba(255,255,255,0.28); }
-  textarea.form-control { resize: vertical; min-height: 110px; }
-  select.form-control option { background: var(--classic-dark); }
-  .upload-zone { border: 2px dashed rgba(255,255,255,0.18); border-radius: 10px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.2s; position: relative; }
-  .upload-zone:hover { border-color: var(--electric-blue); background: rgba(6,120,213,0.05); }
-  .upload-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
-  .upload-zone .u-icon { font-size: 28px; margin-bottom: 6px; }
-  .upload-zone p { font-size: 13px; color: rgba(255,255,255,0.55); }
-  .upload-zone strong { color: var(--electric-blue); }
-  .upload-preview { margin-top: 8px; font-size: 13px; color: var(--gold); }
-  .big-btn { width: 100%; background: var(--electric-blue); color: var(--white); border: none; padding: 15px; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; margin-top: 18px; transition: background 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
-  .big-btn:hover { background: #0560b0; }
-  .big-btn:disabled { background: var(--charcoal); cursor: not-allowed; }
-
-  /* VIEW MODAL */
-  .view-box { background: var(--classic-blue); border-radius: 16px; width: 100%; max-width: 740px; border: 1px solid rgba(255,255,255,0.1); animation: slideUp 0.3s ease; }
-  .view-img { width: 100%; height: 260px; border-radius: 16px 16px 0 0; background: var(--classic-dark); display: flex; align-items: center; justify-content: center; font-size: 80px; overflow: hidden; }
-  .view-img img { width: 100%; height: 100%; object-fit: cover; }
-  .view-body { padding: 26px 30px 30px; }
-  .view-meta { display: flex; gap: 7px; margin-bottom: 10px; flex-wrap: wrap; align-items: center; }
-  .view-title { font-family: 'Playfair Display', serif; font-size: 30px; font-weight: 900; margin-bottom: 5px; }
-  .view-by { font-size: 13px; color: rgba(255,255,255,0.5); margin-bottom: 22px; }
-  .rsection { margin-bottom: 22px; }
-  .rsection h4 { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: 9px; }
-  .rsection p, .rsection pre { font-size: 15px; line-height: 1.75; color: rgba(255,255,255,0.85); white-space: pre-wrap; font-family: 'DM Sans', sans-serif; }
-  .pdf-link { display: inline-flex; align-items: center; gap: 8px; background: rgba(243,185,33,0.1); border: 1px solid rgba(243,185,33,0.3); color: var(--gold); padding: 9px 16px; border-radius: 8px; font-size: 14px; font-weight: 600; text-decoration: none; margin-top: 6px; }
-  .pdf-link:hover { background: rgba(243,185,33,0.2); }
-  .edit-own-btn { background: rgba(6,120,213,0.14); border: 1px solid rgba(6,120,213,0.28); color: var(--electric-blue); font-size: 12px; font-weight: 700; padding: 5px 12px; border-radius: 8px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; }
-  .edit-own-btn:hover { background: rgba(6,120,213,0.25); }
-
-  /* COMMENTS */
-  .comments-wrap { border-top: 1px solid rgba(255,255,255,0.07); padding-top: 22px; margin-top: 6px; }
-  .comments-wrap h4 { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: 14px; }
-  .comment-item { background: rgba(255,255,255,0.05); border-radius: 10px; padding: 13px 15px; margin-bottom: 9px; }
-  .comment-author { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
-  .comment-date { font-size: 11px; color: rgba(255,255,255,0.38); margin-bottom: 5px; }
-  .comment-text { font-size: 14px; color: rgba(255,255,255,0.8); line-height: 1.5; }
-  .comment-form { display: flex; flex-direction: column; gap: 9px; margin-top: 14px; }
-  .comment-row { display: flex; gap: 9px; }
-  .comment-row .form-control { flex: 1; }
-  .comment-submit { background: var(--electric-blue); color: var(--white); border: none; padding: 11px 20px; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; cursor: pointer; transition: background 0.2s; white-space: nowrap; }
-  .comment-submit:hover { background: #0560b0; }
-
-  /* ADMIN */
-  .admin-panel { display: none; min-height: 100vh; }
-  .admin-panel.open { display: block; }
-  .admin-hd { background: var(--classic-dark); border-bottom: 3px solid var(--gold); padding: 18px 40px; display: flex; align-items: center; justify-content: space-between; }
-  .admin-hd h2 { font-family: 'Playfair Display', serif; font-size: 22px; }
-  .admin-hd h2 span { color: var(--gold); }
-  .back-btn { background: rgba(255,255,255,0.08); border: none; color: var(--white); padding: 8px 18px; border-radius: 8px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 14px; transition: background 0.2s; }
-  .back-btn:hover { background: rgba(255,255,255,0.15); }
-  .admin-body { max-width: 1100px; margin: 0 auto; padding: 36px 40px; }
-  .tabs { display: flex; gap: 3px; background: rgba(255,255,255,0.05); padding: 4px; border-radius: 10px; width: fit-content; margin-bottom: 28px; }
-  .tab { padding: 9px 20px; border-radius: 7px; border: none; background: none; color: rgba(255,255,255,0.45); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
-  .tab.active { background: var(--electric-blue); color: var(--white); }
-  .tab-panel { display: none; }
-  .tab-panel.active { display: block; }
-  .filter-row { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; flex-wrap: wrap; }
-  .filter-row label { font-size: 13px; color: rgba(255,255,255,0.5); }
-  .a-list { display: flex; flex-direction: column; gap: 10px; }
-  .a-row { background: var(--classic-blue); border-radius: 11px; padding: 14px 18px; display: flex; align-items: center; gap: 14px; border: 1px solid rgba(255,255,255,0.06); transition: border-color 0.2s; }
-  .a-row.highlighted { border-color: var(--gold); background: rgba(243,185,33,0.04); }
-  .a-thumb { width: 52px; height: 52px; border-radius: 8px; background: var(--classic-dark); display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; overflow: hidden; }
-  .a-thumb img { width: 100%; height: 100%; object-fit: cover; }
-  .a-info { flex: 1; min-width: 0; }
-  .a-name { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; margin-bottom: 3px; }
-  .a-meta { font-size: 12px; color: rgba(255,255,255,0.45); }
-  .a-actions { display: flex; gap: 7px; flex-wrap: wrap; flex-shrink: 0; }
-  .abtn { font-size: 12px; font-weight: 700; padding: 6px 13px; border-radius: 7px; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; border: 1px solid; }
-  .abtn-gold { background: rgba(243,185,33,0.1); border-color: rgba(243,185,33,0.3); color: var(--gold); }
-  .abtn-gold.on { background: var(--gold); color: var(--classic-dark); }
-  .abtn-gold:hover { background: var(--gold); color: var(--classic-dark); }
-  .abtn-blue { background: rgba(6,120,213,0.12); border-color: rgba(6,120,213,0.3); color: var(--electric-blue); }
-  .abtn-blue:hover { background: rgba(6,120,213,0.25); }
-  .abtn-red { background: rgba(172,21,52,0.1); border-color: rgba(172,21,52,0.3); color: var(--red); }
-  .abtn-red:hover { background: rgba(172,21,52,0.25); }
-
-
-  /* STAR RATING */
-  .rating-wrap { border-top: 1px solid rgba(255,255,255,0.07); padding-top: 22px; margin-bottom: 22px; }
-  .rating-wrap h4 { font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: 14px; }
-  .stars-display { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
-  .avg-stars { display: flex; gap: 2px; font-size: 20px; }
-  .avg-label { font-size: 14px; color: rgba(255,255,255,0.65); }
-  .avg-label strong { color: var(--white); font-size: 17px; }
-  .star-input { display: flex; direction: rtl; gap: 4px; margin-bottom: 6px; }
-  .star-input input { display: none; }
-  .star-input label { font-size: 34px; cursor: pointer; color: rgba(255,255,255,0.18); transition: color 0.12s; direction: ltr; line-height: 1; }
-  .star-input:hover label, .star-input label:hover ~ label { color: var(--gold); }
-  .star-input label:hover, .star-input input:checked ~ label { color: var(--gold); }
-  .already-rated { display: inline-flex; align-items: center; gap: 8px; background: rgba(243,185,33,0.08); border: 1px solid rgba(243,185,33,0.22); border-radius: 10px; padding: 9px 16px; font-size: 14px; color: rgba(255,255,255,0.7); margin-top: 4px; }
-  .rate-note { font-size: 13px; color: rgba(255,255,255,0.38); padding: 6px 0; }
-  .rate-note a { color: var(--electric-blue); cursor: pointer; text-decoration: underline; }
-  /* TOAST */
-  .toast { position: fixed; bottom: 28px; right: 28px; background: var(--green); color: var(--white); padding: 13px 22px; border-radius: 10px; font-weight: 700; font-size: 14px; z-index: 999; transform: translateY(80px); opacity: 0; transition: all 0.3s; }
-  .toast.show { transform: translateY(0); opacity: 1; }
-  .toast.error { background: var(--red); }
-
-  /* LOADING */
-  .loading { text-align: center; padding: 60px; color: rgba(255,255,255,0.4); font-size: 14px; }
-  .spinner { display: inline-block; width: 26px; height: 26px; border: 3px solid rgba(255,255,255,0.1); border-top-color: var(--electric-blue); border-radius: 50%; animation: spin 0.7s linear infinite; margin-bottom: 10px; }
+  #loading-overlay { position: fixed; inset: 0; background: var(--bg); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999; gap: 16px; }
+  #loading-overlay h2 { font-family: 'DM Serif Display', serif; font-size: 1.6rem; }
+  #loading-overlay h2 span { color: var(--accent); font-style: italic; }
+  .spinner { width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
+  #loading-msg { font-size: 0.85rem; color: var(--text-muted); }
 
-  /* FOOTER */
-  footer { background: var(--classic-blue); border-top: 1px solid rgba(255,255,255,0.06); text-align: center; padding: 24px; font-size: 13px; color: rgba(255,255,255,0.3); }
-  footer strong { color: var(--gold); }
+  header { display: flex; align-items: center; gap: 8px; padding: 10px 16px; background: var(--surface); border-bottom: 2px solid var(--accent); position: sticky; top: 0; z-index: 100; flex-wrap: wrap; }
+  .logo { font-family: 'DM Serif Display', serif; font-size: 1.2rem; white-space: nowrap; }
+  .logo span { color: var(--accent); font-style: italic; }
+  .nav-controls { display: flex; align-items: center; gap: 5px; }
+  .nav-btn { background: var(--surface2); border: 1px solid var(--accent); color: var(--text); width: 27px; height: 27px; border-radius: 5px; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+  .nav-btn:hover { background: var(--accent); }
+  #month-label { font-family: 'DM Serif Display', serif; font-size: 0.95rem; min-width: 140px; text-align: center; }
+  .today-btn { background: var(--surface2); border: 1px solid var(--accent); color: var(--text-muted); padding: 4px 10px; border-radius: 5px; cursor: pointer; font-size: 0.72rem; transition: all 0.15s; }
+  .today-btn:hover { background: var(--accent); color: #fff; }
+  .week-btn { background: var(--surface2); border: 1px solid var(--accent); color: var(--text-muted); padding: 4px 10px; border-radius: 5px; cursor: pointer; font-size: 0.72rem; transition: all 0.15s; white-space: nowrap; }
+  .week-btn:hover { background: var(--accent); color: #fff; }
+  .view-switcher { display: flex; background: var(--surface2); border: 1px solid var(--accent); border-radius: 5px; overflow: hidden; }
+  .view-btn { background: none; border: none; color: var(--text-muted); padding: 5px 11px; cursor: pointer; font-size: 0.72rem; font-family: 'DM Sans', sans-serif; font-weight: 500; transition: all 0.15s; }
+  .view-btn.active { background: var(--accent); color: #fff; font-weight: 600; }
+  .rt-badge { display: flex; align-items: center; gap: 4px; font-size: 0.66rem; color: var(--text-muted); }
+  .rt-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--holiday); animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .search-wrap { position: relative; }
+  .search-input { background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 5px 10px 5px 28px; border-radius: 5px; font-family: 'DM Sans', sans-serif; font-size: 0.73rem; width: 160px; transition: border-color 0.15s, width 0.2s; }
+  .search-input:focus { outline: none; border-color: var(--accent); width: 200px; }
+  .search-input::placeholder { color: var(--text-muted); }
+  .search-icon { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-size: 0.7rem; color: var(--text-muted); pointer-events: none; }
+  .search-results { position: absolute; top: calc(100% + 4px); left: 0; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; z-index: 300; max-height: 200px; overflow-y: auto; display: none; box-shadow: 0 8px 24px rgba(0,0,0,0.4); min-width: 240px; }
+  .search-results.show { display: block; }
+  .search-result-item { padding: 8px 10px; cursor: pointer; border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  .search-result-item:last-child { border-bottom: none; }
+  .search-result-item:hover { background: var(--surface2); }
+  .sr-name { font-size: 0.78rem; font-weight: 500; }
+  .sr-meta { font-size: 0.65rem; color: var(--text-muted); margin-top: 2px; }
+  .sr-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 4px; vertical-align: middle; }
+  .search-empty { padding: 12px 10px; font-size: 0.75rem; color: var(--text-muted); text-align: center; }
+  .add-btn { background: var(--accent); color: #fff; border: none; padding: 6px 13px; border-radius: 5px; cursor: pointer; font-size: 0.78rem; font-weight: 600; margin-left: auto; transition: background 0.15s; }
+  .add-btn:hover { background: var(--accent-hover); }
 
-  @media (max-width: 640px) {
-    header { padding: 0 16px; }
-    .hero, .theme-strip, .top20-banner { padding-left: 20px; padding-right: 20px; }
-    main, .hof-outer, .admin-body { padding-left: 20px; padding-right: 20px; }
-    .form-grid { grid-template-columns: 1fr; }
-    .box-body, .view-body { padding: 18px 18px 24px; }
-    .box-header { padding: 20px 18px 0; }
-    .comment-row { flex-direction: column; }
-    .a-row { flex-wrap: wrap; }
+  main { display: flex; flex: 1; overflow: hidden; min-height: 0; }
+
+  .side-panel { width: var(--panel-width); min-width: var(--panel-width); background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; transition: width 0.22s ease, min-width 0.22s ease; overflow: hidden; position: relative; flex-shrink: 0; }
+  .side-panel.collapsed { width: 34px; min-width: 34px; }
+  .panel-toggle { position: absolute; top: 8px; right: 6px; background: var(--surface2); border: 1px solid var(--border); color: var(--text-muted); width: 20px; height: 20px; border-radius: 4px; cursor: pointer; font-size: 0.62rem; display: flex; align-items: center; justify-content: center; z-index: 10; transition: all 0.15s; }
+  .panel-toggle:hover { background: var(--accent); color: #fff; border-color: var(--accent); }
+  .panel-content { padding: 8px 10px; overflow-y: auto; flex: 1; opacity: 1; transition: opacity 0.18s; padding-top: 32px; }
+  .side-panel.collapsed .panel-content { opacity: 0; pointer-events: none; }
+  .panel-collapsed-label { display: none; writing-mode: vertical-rl; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); padding-top: 40px; padding-left: 8px; }
+  .side-panel.collapsed .panel-collapsed-label { display: block; }
+  .panel-section { margin-bottom: 14px; }
+  .panel-section-hdr { display: flex; align-items: center; justify-content: space-between; font-size: 0.6rem; font-weight: 600; letter-spacing: 0.11em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; cursor: pointer; user-select: none; padding: 2px 0; }
+  .panel-section-hdr:hover { color: var(--text); }
+  .sec-arrow { font-size: 0.55rem; transition: transform 0.18s; }
+  .sec-arrow.open { transform: rotate(90deg); }
+  .office-list { display: flex; flex-direction: column; gap: 2px; }
+  .office-item { display: flex; align-items: center; gap: 7px; padding: 3px 5px; border-radius: 5px; cursor: pointer; user-select: none; font-size: 0.73rem; transition: background 0.1s; }
+  .office-item:hover { background: var(--surface2); }
+  .office-item.hidden { opacity: 0.28; }
+  .o-dot { width: 10px; height: 10px; border-radius: 3px; flex-shrink: 0; }
+  .o-name { flex: 1; }
+  .type-list { display: flex; flex-direction: column; gap: 5px; }
+  .type-item { display: flex; align-items: flex-start; gap: 6px; padding: 2px 5px; }
+  .t-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .t-label { font-size: 0.72rem; }
+  .t-sub { font-size: 0.61rem; color: var(--text-muted); margin-top: 1px; }
+  .whosoff-section { border-top: 1px solid var(--border); padding-top: 12px; margin-top: 2px; }
+  .whosoff-date { font-family: 'DM Serif Display', serif; font-size: 0.92rem; margin-bottom: 8px; }
+  .whosoff-empty { color: var(--text-muted); font-size: 0.75rem; font-style: italic; text-align: center; padding: 10px 0; }
+  .wo-group { margin-bottom: 9px; }
+  .wo-group-title { font-size: 0.58rem; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; margin-bottom: 4px; padding-bottom: 3px; border-bottom: 1px solid var(--border); }
+  .wo-entry { display: flex; align-items: flex-start; gap: 5px; padding: 3px; border-radius: 4px; cursor: pointer; transition: background 0.1s; }
+  .wo-entry:hover { background: var(--surface2); }
+  .wo-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .wo-name { font-size: 0.75rem; font-weight: 500; }
+  .wo-type { font-size: 0.63rem; color: var(--text-muted); margin-top: 1px; }
+  .wo-backup { font-size: 0.62rem; color: var(--accent-hover); margin-top: 1px; }
+  .wo-fwd { font-size: 0.62rem; color: var(--team-member); margin-top: 1px; }
+  .wo-half { display: inline-block; font-size: 0.49rem; background: var(--half-day); color: #000; border-radius: 2px; padding: 0 3px; font-weight: 700; margin-left: 3px; vertical-align: middle; }
+  .day-add-btn { background: none; border: 1px dashed var(--border); color: var(--text-muted); width: 100%; padding: 5px; border-radius: 5px; cursor: pointer; font-size: 0.7rem; font-family: 'DM Sans', sans-serif; margin-top: 5px; transition: all 0.15s; }
+  .day-add-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* Team directory */
+  .team-member-item { padding: 5px 5px; border-radius: 5px; margin-bottom: 3px; transition: background 0.1s; }
+  .team-member-item:hover { background: var(--surface2); }
+  .tm-name { font-size: 0.73rem; font-weight: 500; }
+  .tm-role { font-size: 0.62rem; color: var(--text-muted); margin-top: 1px; }
+  .tm-office { font-size: 0.6rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin: 8px 0 4px; padding-bottom: 3px; border-bottom: 1px solid var(--border); }
+
+  /* SWO link */
+  .swc-link { display: flex; align-items: center; gap: 7px; padding: 8px 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; text-decoration: none; color: var(--text); font-size: 0.75rem; font-weight: 500; transition: all 0.15s; margin-top: 2px; }
+  .swc-link:hover { border-color: var(--accent); background: rgba(6,120,213,0.1); color: var(--accent); }
+  .swc-link-icon { font-size: 1rem; flex-shrink: 0; }
+
+  .calendar-wrap { flex: 1; padding: 12px; overflow-y: auto; display: flex; flex-direction: column; }
+  .calendar-wrap.week-mode { overflow: hidden; }
+
+  /* ── TODAY VIEW ── */
+  .today-view { display: flex; flex-direction: column; gap: 14px; padding: 4px 0; }
+  .today-header { margin-bottom: 2px; }
+  .today-headline { font-family: 'DM Serif Display', serif; font-size: 1.8rem; }
+  .today-headline span { color: var(--accent); font-style: italic; }
+  .today-subline { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+  .today-summary { display: flex; gap: 10px; flex-wrap: wrap; }
+  .summary-pill { display: flex; align-items: center; gap: 6px; background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 5px 12px; font-size: 0.75rem; }
+  .summary-pill-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .summary-pill-count { font-weight: 700; font-size: 1rem; }
+  .summary-pill-label { color: var(--text-muted); }
+  .today-no-entries { display: flex; flex-direction: column; align-items: center; justify-content: center; flex: 1; gap: 12px; color: var(--text-muted); padding: 40px 0; }
+  .today-no-entries .big-icon { font-size: 3rem; }
+  .today-no-entries p { font-size: 0.9rem; }
+  .today-holiday-banner { background: rgba(62,189,62,0.12); border: 1px solid rgba(62,189,62,0.3); border-radius: 10px; padding: 14px 18px; display: flex; align-items: center; gap: 12px; }
+  .today-holiday-icon { font-size: 1.6rem; }
+  .today-holiday-name { font-size: 0.95rem; font-weight: 600; color: var(--holiday); }
+  .today-holiday-sub { font-size: 0.72rem; color: var(--text-muted); margin-top: 2px; }
+  .today-office-section { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .today-office-header { display: flex; align-items: center; gap: 10px; padding: 11px 16px; border-bottom: 1px solid var(--border); }
+  .today-office-color { width: 14px; height: 14px; border-radius: 4px; flex-shrink: 0; }
+  .today-office-name { font-size: 0.9rem; font-weight: 600; flex: 1; }
+  .today-office-count { font-size: 0.72rem; color: var(--text-muted); background: var(--surface2); border-radius: 10px; padding: 2px 8px; }
+  .today-entry-row { display: flex; align-items: flex-start; gap: 12px; padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.1s; cursor: pointer; }
+  .today-entry-row:last-child { border-bottom: none; }
+  .today-entry-row:hover { background: var(--surface2); }
+  .today-entry-type-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .today-entry-info { flex: 1; }
+  .today-entry-name { font-size: 0.88rem; font-weight: 600; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .today-entry-half { font-size: 0.58rem; background: var(--team-member); color: #000; border-radius: 3px; padding: 1px 5px; font-weight: 700; }
+  .today-entry-type { font-size: 0.73rem; color: var(--text-muted); margin-top: 2px; }
+  .today-entry-dates { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; }
+  .today-entry-backup { font-size: 0.72rem; color: var(--accent-hover); margin-top: 2px; }
+  .today-entry-fwd { font-size: 0.72rem; color: var(--team-member); margin-top: 2px; }
+  .today-entry-note { font-size: 0.7rem; color: var(--text-muted); margin-top: 2px; font-style: italic; }
+
+  /* ── Month view with spanning + expanding ── */
+  .cal-month { display: flex; flex-direction: column; gap: 4px; }
+  .day-headers { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; margin-bottom: 2px; }
+  .day-hdr { text-align: center; font-size: 0.62rem; font-weight: 600; letter-spacing: 0.09em; text-transform: uppercase; color: var(--text-muted); padding: 4px 0 6px; }
+  .week-row { position: relative; margin-bottom: 4px; }
+  .week-cells { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; }
+  .day-cell { background: var(--surface); border: 1px solid var(--border); border-radius: 7px; padding: 5px; cursor: pointer; transition: border-color 0.12s; }
+  .day-cell:hover { border-color: var(--accent); }
+  .day-cell.today { border-color: var(--team-member); border-width: 2px; }
+  .day-cell.today .day-num { color: var(--team-member); font-weight: 700; }
+  .day-cell.selected { border-color: var(--accent); border-width: 2px; background: rgba(6,120,213,0.07); }
+  .day-cell.other-month { opacity: 0.2; }
+  .day-num { font-size: 0.74rem; font-weight: 600; color: var(--text-muted); }
+  .week-events { position: absolute; top: 0; left: 0; right: 0; pointer-events: none; display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; padding-top: 22px; }
+  .span-chip { pointer-events: all; display: flex; align-items: center; gap: 4px; padding: 3px 7px; border-radius: 4px; font-size: 0.67rem; font-weight: 600; cursor: pointer; border-left: 4px solid transparent; overflow: hidden; white-space: nowrap; height: 22px; margin-bottom: 2px; transition: filter 0.12s; align-self: start; }
+  .span-chip:hover { filter: brightness(1.2); }
+  .span-chip.cont-right { border-radius: 4px 0 0 4px; margin-right: -2px; }
+  .span-chip.cont-left  { border-radius: 0 4px 4px 0; margin-left: -2px; padding-left: 5px; }
+  .span-chip.cont-both  { border-radius: 0; margin-left: -2px; margin-right: -2px; padding-left: 5px; }
+  .chip-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+  .chip-name { overflow: hidden; text-overflow: ellipsis; flex: 1; }
+  .chip-half { font-size: 0.49rem; background: var(--half-day); color: #000; border-radius: 2px; padding: 0 3px; font-weight: 700; flex-shrink: 0; }
+  .chip-office-tag { font-size: 0.58rem; font-weight: 400; opacity: 0.8; }
+
+  /* ── Week view ── */
+  .week-wrap { display: flex; flex-direction: column; height: 100%; }
+  .week-hdrs { display: grid; grid-template-columns: repeat(5,1fr); gap: 4px; }
+  .week-grid { flex: 1; display: grid; grid-template-columns: repeat(5,1fr); gap: 4px; min-height: 0; }
+  .week-cell { background: var(--surface); border: 1px solid var(--border); border-radius: 7px; height: 100%; overflow-y: auto; padding: 6px; cursor: pointer; transition: border-color 0.12s; }
+  .week-cell:hover { border-color: var(--accent); }
+  .week-cell.today { border-color: var(--team-member); border-width: 2px; }
+  .week-cell.today .wc-day-num { color: var(--team-member); font-weight: 700; }
+  .week-cell.selected { border-color: var(--accent); border-width: 2px; background: rgba(6,120,213,0.07); }
+  .wc-day-num { font-size: 0.74rem; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
+  .week-chip { display: flex; flex-direction: column; padding: 4px 6px 4px 8px; border-radius: 5px; margin-bottom: 3px; cursor: pointer; background: rgba(255,255,255,0.05); border-left: 4px solid transparent; transition: filter 0.12s; }
+  .week-chip:hover { filter: brightness(1.18); background: rgba(255,255,255,0.09); }
+  .wc-row1 { display: flex; align-items: center; gap: 4px; }
+  .wc-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
+  .wc-name { font-size: 0.68rem; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; }
+  .wc-half { font-size: 0.49rem; background: var(--half-day); color: #000; border-radius: 2px; padding: 0 3px; font-weight: 700; }
+  .wc-row2 { display: flex; align-items: center; gap: 4px; margin-top: 1px; padding-left: 9px; flex-wrap: wrap; }
+  .wc-office { font-size: 0.6rem; font-weight: 500; }
+  .wc-backup { font-size: 0.59rem; color: var(--accent-hover); }
+  .wc-backup::before { content: '↩ '; }
+  .wc-fwd { font-size: 0.59rem; color: var(--team-member); }
+  .wc-fwd::before { content: '📞 '; }
+
+  .saving-indicator { position: fixed; bottom: 18px; right: 18px; background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; padding: 7px 13px; font-size: 0.75rem; color: var(--text-muted); display: none; align-items: center; gap: 7px; z-index: 150; }
+  .saving-indicator.show { display: flex; }
+  .saving-indicator.success { border-color: var(--holiday); color: var(--holiday); }
+  .saving-indicator.error { border-color: var(--warning); color: var(--warning); }
+
+  .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 22px; width: 450px; max-width: 96vw; max-height: 90vh; overflow-y: auto; animation: up 0.17s ease; }
+  @keyframes up { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal h2 { font-family: 'DM Serif Display', serif; font-size: 1.18rem; margin-bottom: 15px; }
+  .form-row { margin-bottom: 11px; }
+  .form-row label { display: block; font-size: 0.68rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; }
+  .form-row label .sub { font-weight: 400; text-transform: none; letter-spacing: 0; font-size: 0.65rem; }
+  .form-row select, .form-row input { width: 100%; background: var(--surface2); border: 1px solid var(--border); color: var(--text); padding: 8px 10px; border-radius: 6px; font-family: 'DM Sans', sans-serif; font-size: 0.81rem; appearance: none; transition: border-color 0.15s; }
+  .form-row select:focus, .form-row input:focus { outline: none; border-color: var(--accent); }
+  .half-toggle { display: flex; align-items: center; gap: 9px; padding: 8px 10px; background: var(--surface2); border: 1px solid var(--border); border-radius: 6px; cursor: pointer; user-select: none; transition: all 0.15s; }
+  .half-toggle:hover { border-color: var(--half-day); }
+  .half-toggle.active { border-color: var(--half-day); background: rgba(243,185,33,0.07); }
+  .tog-sw { width: 28px; height: 16px; background: var(--border); border-radius: 8px; position: relative; transition: background 0.2s; flex-shrink: 0; }
+  .tog-sw::after { content: ''; position: absolute; top: 2px; left: 2px; width: 12px; height: 12px; border-radius: 50%; background: var(--text-muted); transition: transform 0.2s, background 0.2s; }
+  .half-toggle.active .tog-sw { background: var(--half-day); }
+  .half-toggle.active .tog-sw::after { transform: translateX(12px); background: #000; }
+  .modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 15px; }
+  .btn-c { background: var(--surface2); border: 1px solid var(--border); color: var(--text-muted); padding: 7px 14px; border-radius: 5px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.8rem; }
+  .btn-s { background: var(--accent); color: #fff; border: none; padding: 7px 17px; border-radius: 5px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.8rem; font-weight: 600; }
+  .btn-s:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-d { background: transparent; border: 1px solid var(--warning); color: var(--warning); padding: 7px 12px; border-radius: 5px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 0.8rem; margin-right: auto; }
+  .btn-d:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  @media (max-width: 768px) {
+    .side-panel, .week-btn, .search-wrap { display: none; }
+    header { padding: 10px 12px; }
+    .calendar-wrap { padding: 8px; }
   }
 </style>
 </head>
 <body>
 
-<!-- ════════════════ MAIN SITE ════════════════ -->
-<div id="mainSite">
+<div id="loading-overlay">
+  <img src="https://samantharank.github.io/Officeservices-Calendar/hub-logo.png" alt="HUB" style="height:48px;width:auto;margin-bottom:8px;">
+  <h2><span>Office Services Calendar</span></h2>
+  <div class="spinner"></div>
+  <div id="loading-msg">Connecting…</div>
+</div>
 
 <header>
-  <div class="logo-area">
-    <img src="hub-logo.png" alt="HUB" style="height:38px;width:auto;">
-    <div class="header-title">The HUB Social</div>
+  <div class="logo"><img src="https://samantharank.github.io/Officeservices-Calendar/hub-logo.png" alt="HUB" style="height:28px;width:auto;margin-right:8px;vertical-align:middle;"><span>Office Services Calendar</span></div>
+  <div class="nav-controls">
+    <button class="nav-btn" id="prev-btn">‹</button>
+    <span id="month-label"></span>
+    <button class="nav-btn" id="next-btn">›</button>
+    <button class="today-btn" id="today-nav-btn">Today</button>
+    <button class="week-btn" id="week-btn">📅 This Week</button>
   </div>
-  <div class="header-right">
-    <div class="header-badge" id="monthBadge">…</div>
-    <div id="userArea" style="display:none;align-items:center;gap:8px;">
-      <div class="user-pill">👤 <span id="userDisplay"></span></div>
-      <button class="btn-sm danger" onclick="signOut()">Sign out</button>
-    </div>
-    <button class="btn-sm" id="signInHdrBtn" onclick="openSignIn()" style="display:none;">Sign In</button>
-    <button class="admin-btn" onclick="openAdminLogin()">⚙️ Admin</button>
+  <div class="view-switcher">
+    <button class="view-btn active" data-view="today">Today</button>
+    <button class="view-btn" data-view="month">Month</button>
+    <button class="view-btn" data-view="week">Week</button>
   </div>
+  <div class="rt-badge"><div class="rt-dot"></div><span>Live</span></div>
+  <div class="search-wrap" id="search-wrap">
+    <span class="search-icon">🔍</span>
+    <input type="text" class="search-input" id="search-input" placeholder="Search by name…">
+    <div class="search-results" id="search-results"></div>
+  </div>
+  <button class="add-btn" id="add-btn">+ Add Entry</button>
 </header>
 
-<div class="hero">
-  <div class="hero-inner">
-    <div class="month-pill" id="heroPill">🗓️ …</div>
-    <h1>The HUB Social<br><em>Recipe Swap</em></h1>
-    <p>Share your favourite dish, discover what your colleagues are cooking, and try something new every month.</p>
-    <div class="hero-cta">
-      <button class="btn-primary" onclick="handleSubmitClick()">🍴 Submit My Recipe</button>
-      <button class="btn-ghost" onclick="document.getElementById('recipesSection').scrollIntoView({behavior:'smooth'})">Browse This Month ↓</button>
-      <button class="btn-ghost" onclick="document.getElementById('hofAnchor').scrollIntoView({behavior:'smooth'})">🏆 Hall of Fame</button>
-    </div>
-  </div>
-</div>
-
-<div class="theme-strip">
-  <div class="theme-strip-inner">
-    <div class="theme-current">
-      <div class="theme-icon" id="themeIcon">🍽️</div>
-      <div class="theme-text">
-        <strong id="themeTitle">Loading…</strong>
-        <span id="themeDesc"></span>
+<main>
+  <div class="side-panel" id="side-panel">
+    <button class="panel-toggle" id="panel-toggle">◀</button>
+    <div class="panel-collapsed-label">Info</div>
+    <div class="panel-content">
+      <div class="panel-section">
+        <div class="panel-section-hdr" onclick="toggleSec('offices')"><span>Offices</span><span class="sec-arrow open" id="offices-arr">▶</span></div>
+        <div id="offices-content"><div class="office-list" id="office-legend"></div></div>
       </div>
-    </div>
-    <div class="theme-next" id="nextMonthPreview">
-      <div class="theme-next-icon" id="nextThemeIcon"></div>
-      <div>
-        <div class="theme-next-label">Coming Next Month</div>
-        <div class="theme-next-name" id="nextThemeName"></div>
+      <div class="panel-section">
+        <div class="panel-section-hdr" onclick="toggleSec('types')"><span>Entry Types</span><span class="sec-arrow open" id="types-arr">▶</span></div>
+        <div id="types-content">
+          <div class="type-list">
+            <div class="type-item"><div class="t-dot" style="background:var(--team-member);margin-top:4px"></div><div><div class="t-label">Team Member Off</div><div class="t-sub">OS Team Member</div></div></div>
+            <div class="type-item"><div class="t-dot" style="background:var(--employee-off);margin-top:4px"></div><div><div class="t-label">Employee Off</div><div class="t-sub">Personal / Commercial Lines</div></div></div>
+            <div class="type-item"><div class="t-dot" style="background:var(--holiday);margin-top:4px"></div><div><div class="t-label">Holiday / Stat Day</div></div></div>
+          </div>
+        </div>
       </div>
+      <div class="panel-section whosoff-section">
+        <div class="panel-section-hdr" onclick="toggleSec('whosoff')"><span>Who's Off</span><span class="sec-arrow open" id="whosoff-arr">▶</span></div>
+        <div id="whosoff-content">
+          <div class="whosoff-date" id="wo-date">Today</div>
+          <div id="wo-entries"><div class="whosoff-empty">Loading…</div></div>
+          <button class="day-add-btn" id="day-add-btn" style="display:none">+ Add Entry for this Day</button>
+        </div>
+      </div>
+
+      <!-- Team Directory -->
+      <div class="panel-section" style="border-top:1px solid var(--border);padding-top:12px;margin-top:2px;">
+        <div class="panel-section-hdr" onclick="toggleSec('team')"><span>Team Directory</span><span class="sec-arrow open" id="team-arr">▶</span></div>
+        <div id="team-content">
+          <div class="tm-office" style="color:#f472b6">Toronto</div>
+          <div class="team-member-item"><div class="tm-name">Dennise Balatbat</div><div class="tm-role">Receptionist</div></div>
+          <div class="team-member-item"><div class="tm-name">Vanessa Reyes</div><div class="tm-role">Team Lead</div></div>
+          <div class="team-member-item"><div class="tm-name">Dieter Verscheure</div><div class="tm-role">Facilities Coordinator</div></div>
+          <div class="tm-office" style="color:#0678d5">Markham</div>
+          <div class="team-member-item"><div class="tm-name">Samantha Rank</div><div class="tm-role">Office Manager</div></div>
+          <div class="team-member-item"><div class="tm-name">Shevy Palmer</div><div class="tm-role">Receptionist</div></div>
+          <div class="tm-office" style="color:#38bdf8">Barrie</div>
+          <div class="team-member-item"><div class="tm-name">Charlene Mooney</div><div class="tm-role">Receptionist Office Coordinator</div></div>
+          <div class="tm-office" style="color:#a78bfa">Oakville</div>
+          <div class="team-member-item"><div class="tm-name">Ellen Chrysler</div><div class="tm-role">Receptionist Office Coordinator</div></div>
+          <div class="tm-office" style="color:#16a34a">Brantford</div>
+          <div class="team-member-item"><div class="tm-name">Tara Carriere</div><div class="tm-role">Receptionist</div></div>
+          <div class="tm-office" style="color:#ff6b6b">Sarnia</div>
+          <div class="team-member-item"><div class="tm-name">Amy Grant</div><div class="tm-role">Receptionist</div></div>
+          <div class="tm-office" style="color:#f97316">London / Chatham</div>
+          <div class="team-member-item"><div class="tm-name">Kaitlyn Brown</div><div class="tm-role">Receptionist</div></div>
+          <div class="tm-office" style="color:#2dd4bf">St. Catharines</div>
+          <div class="team-member-item"><div class="tm-name">Gurpreet Kaur</div><div class="tm-role">Receptionist</div></div>
+        </div>
+      </div>
+
+      <!-- SWO Review Link -->
+      <div class="panel-section" style="margin-top:6px;">
+        <a href="https://sworeview.netlify.app/" target="_blank" class="swc-link">
+          <span class="swc-link-icon">🔗</span>
+          <span>HUB SWO Review Page</span>
+        </a>
+      </div>
+
     </div>
   </div>
-</div>
-
-<!-- TOP 20 THIS MONTH -->
-<div class="top20-banner" id="top20Banner" style="display:none;">
-  <div class="top20-inner">
-    <div class="top20-head"><h3>⭐ This Month's <span>Top 20</span></h3></div>
-    <div class="top20-grid" id="top20Grid"></div>
-  </div>
-</div>
-
-<!-- RECIPES -->
-<main id="recipesSection">
-  <div class="section-header">
-    <h2 class="section-title"><span id="monthName">This Month</span>'s Recipes</h2>
-    <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-      <div class="recipe-count" id="recipeCount">Loading…</div>
-      <button class="past-months-btn" onclick="togglePastMonths()">📅 Past Months</button>
-    </div>
-  </div>
-  <div id="pastMonthsBar" style="display:none;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:16px 20px;margin-bottom:24px;">
-    <p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:12px;">Browse recipes from a previous month:</p>
-    <div style="display:flex;gap:8px;flex-wrap:wrap;" id="pastMonthBtns"></div>
-  </div>
-  <div class="recipe-grid" id="recipeGrid">
-    <div class="loading"><div class="spinner"></div><br>Loading recipes…</div>
-  </div>
+  <div class="calendar-wrap" id="cal-wrap"></div>
 </main>
 
-<!-- HALL OF FAME -->
-<div class="hof-outer">
-  <h2 id="hofAnchor">🏆 Hall of <span>Fame</span></h2>
-  <div id="hofContent"><div class="loading"><div class="spinner"></div><br>Loading…</div></div>
-</div>
-
-<footer><strong>The HUB Social</strong> · Recipe Swap · Connecting colleagues one dish at a time 🍴</footer>
-</div><!-- /mainSite -->
-
-<!-- ════════════════ ADMIN PANEL ════════════════ -->
-<div class="admin-panel" id="adminPanel">
-  <div class="admin-hd">
-    <h2>⚙️ Admin <span>Dashboard</span></h2>
-    <button class="back-btn" onclick="closeAdmin()">← Back to Site</button>
-  </div>
-  <div class="admin-body">
-    <div class="tabs">
-      <button class="tab active" data-tab="all" onclick="switchTab(this,'all')">📋 All Recipes</button>
-      <button class="tab" data-tab="top20" onclick="switchTab(this,'top20')">⭐ Top 20 Picks</button>
-      <button class="tab" data-tab="hof" onclick="switchTab(this,'hof')">🏆 Hall of Fame</button>
+<div class="modal-overlay" id="event-modal">
+  <div class="modal">
+    <h2 id="modal-title">Add Entry</h2>
+    <div class="form-row">
+      <label>Entry Type</label>
+      <select id="entry-type" onchange="syncForm()">
+        <option value="team-member">Team Member Off (OS Team Member)</option>
+        <option value="employee-off">Employee Off (Personal / Commercial Lines)</option>
+        <option value="holiday">Holiday / Stat Day</option>
+      </select>
     </div>
-
-    <div class="tab-panel active" id="panel-all">
-      <div class="filter-row">
-        <label>Month:</label>
-        <select class="form-control" id="filterAll" onchange="loadAdminAll()" style="width:200px;"></select>
+    <div class="form-row" id="office-row">
+      <label>Office</label>
+      <select id="entry-office"></select>
+    </div>
+    <div class="form-row" id="name-row">
+      <label id="name-lbl">Team Member Name</label>
+      <input type="text" id="entry-name" placeholder="Type name…">
+    </div>
+    <div class="form-row" id="backup-row" style="display:none">
+      <label>Backup Person <span class="sub">(optional)</span></label>
+      <input type="text" id="entry-backup" placeholder="Who covers their calls?">
+    </div>
+    <div class="form-row" id="forward-row" style="display:none">
+      <label>Forward Calls To <span class="sub">(optional)</span></label>
+      <input type="text" id="entry-forward" placeholder="e.g. Sarnia — Amy">
+    </div>
+    <div class="form-row" id="holiday-row" style="display:none">
+      <label>Holiday Name</label>
+      <input type="text" id="entry-holiday-name" placeholder="e.g. Good Friday">
+    </div>
+    <div class="form-row">
+      <label>Date</label>
+      <input type="date" id="entry-date">
+    </div>
+    <div class="form-row">
+      <label>End Date <span class="sub">(optional — multi-day)</span></label>
+      <input type="date" id="entry-end-date">
+    </div>
+    <div class="form-row">
+      <label>Half Day</label>
+      <div class="half-toggle" id="half-toggle" onclick="setHalf(!halfActive)">
+        <div class="tog-sw"></div><span>Mark as half day</span>
       </div>
-      <div class="a-list" id="adminAllList"><div class="loading"><div class="spinner"></div></div></div>
     </div>
-
-    <div class="tab-panel" id="panel-top20">
-      <div class="filter-row">
-        <label>Month:</label>
-        <select class="form-control" id="filterTop20" onchange="loadAdminTop20()" style="width:200px;"></select>
-      </div>
-      <p style="color:rgba(255,255,255,0.45);font-size:13px;margin-bottom:18px;">Toggle the ⭐ button to include or remove recipes from the Top 20 highlight on the main page.</p>
-      <div class="a-list" id="adminTop20List"><div class="loading"><div class="spinner"></div></div></div>
+    <div class="form-row">
+      <label>Note <span class="sub">(optional)</span></label>
+      <input type="text" id="entry-note" placeholder="Any details…">
     </div>
-
-    <div class="tab-panel" id="panel-hof">
-      <p style="color:rgba(255,255,255,0.45);font-size:13px;margin-bottom:22px;">All Top 20 picks across every month, as shown in the Hall of Fame.</p>
-      <div id="adminHofList"><div class="loading"><div class="spinner"></div></div></div>
-    </div>
-  </div>
-</div>
-
-<!-- ════════════════ MODALS ════════════════ -->
-
-<!-- SIGN IN -->
-<div class="modal-backdrop" id="signInModal">
-  <div class="signin-box">
-    <button class="abs-close" onclick="closeSignIn()">✕</button>
-    <div class="icon">🍴</div>
-    <h2>Sign in to Submit</h2>
-    <p>Enter your HUB email to submit and edit your own recipes. No password needed!</p>
-    <input type="email" class="signin-input" id="siEmail" placeholder="you@hubinternational.com" onkeydown="if(event.key==='Enter')doSignIn()">
-    <button class="signin-btn" onclick="doSignIn()">Continue →</button>
-    <div class="signin-note">@hubinternational.com and @hubprivateclient.com only</div>
-  </div>
-</div>
-
-<!-- ADMIN LOGIN -->
-<div class="modal-backdrop" id="adminLoginModal">
-  <div class="signin-box">
-    <button class="abs-close" onclick="closeAdminLogin()">✕</button>
-    <div class="icon">⚙️</div>
-    <h2>Admin Access</h2>
-    <p>Enter the admin password to access the dashboard.</p>
-    <input type="password" class="signin-input" id="adminPwInput" placeholder="Password" onkeydown="if(event.key==='Enter')checkAdminPw()">
-    <button class="signin-btn" onclick="checkAdminPw()">Enter Admin Panel</button>
-  </div>
-</div>
-
-<!-- SUBMIT / EDIT -->
-<div class="modal-backdrop" id="submitModal">
-  <div class="submit-box">
-    <div class="box-header">
-      <div>
-        <h2 id="submitTitle">🍴 Submit Your Recipe</h2>
-        <p>Share your dish with your HUB colleagues</p>
-      </div>
-      <button class="abs-close" style="position:relative;top:0;right:0;flex-shrink:0;" onclick="closeSubmit()">✕</button>
-    </div>
-    <div class="box-body">
-      <div class="form-grid">
-        <div class="form-group">
-          <label>Full Name <span class="req">*</span></label>
-          <input type="text" class="form-control" id="fName" placeholder="Jane Smith">
-        </div>
-        <div class="form-group">
-          <label>Office Location <span class="req">*</span></label>
-          <input type="text" class="form-control" id="fOffice" placeholder="e.g. Toronto">
-        </div>
-        <div class="form-group">
-          <label>Department <span class="req">*</span></label>
-          <input type="text" class="form-control" id="fDept" placeholder="e.g. Commercial Lines">
-        </div>
-        <div class="form-group">
-          <label>Recipe Name <span class="req">*</span></label>
-          <input type="text" class="form-control" id="fRecipeName" placeholder="e.g. Nonna's Lasagna">
-        </div>
-        <div class="form-group form-full">
-          <label>Origin / History <span style="color:rgba(255,255,255,0.35);font-size:11px;letter-spacing:0;">(optional)</span></label>
-          <textarea class="form-control" id="fOrigin" placeholder="Where does this recipe come from? A family tradition, a country, a memory…" style="min-height:76px;"></textarea>
-        </div>
-        <div class="form-group form-full">
-          <label>Your Recipe <span class="req">*</span></label>
-          <textarea class="form-control" id="fRecipe" placeholder="Ingredients:&#10;- ...&#10;&#10;Instructions:&#10;1. ..."></textarea>
-        </div>
-        <div class="form-group form-full">
-          <label>Photo of Dish <span style="color:rgba(255,255,255,0.35);font-size:11px;">(optional)</span></label>
-          <div class="upload-zone">
-            <input type="file" id="fPhoto" accept="image/*" onchange="handlePhoto(this)">
-            <div class="u-icon">📸</div>
-            <p><strong>Click to upload</strong> or drag & drop · JPG, PNG, WEBP up to 5MB</p>
-            <div class="upload-preview" id="photoPreview"></div>
-          </div>
-        </div>
-        <div class="form-group form-full">
-          <label>Recipe PDF / File <span style="color:rgba(255,255,255,0.35);font-size:11px;">(optional)</span></label>
-          <div class="upload-zone">
-            <input type="file" id="fPdf" accept=".pdf,.doc,.docx" onchange="handlePdf(this)">
-            <div class="u-icon">📄</div>
-            <p><strong>Click to upload</strong> a PDF or Word document</p>
-            <div class="upload-preview" id="pdfPreview"></div>
-          </div>
-        </div>
-      </div>
-      <button class="big-btn" id="submitBtn" onclick="saveRecipe()">✅ Share My Recipe</button>
+    <div class="modal-actions">
+      <button class="btn-d" id="del-btn" style="display:none">🗑 Delete</button>
+      <button class="btn-c" id="cancel-btn">Cancel</button>
+      <button class="btn-s" id="save-btn">Save Entry</button>
     </div>
   </div>
 </div>
 
-<!-- VIEW RECIPE -->
-<div class="modal-backdrop" id="viewModal">
-  <div class="view-box">
-    <div class="view-img" id="viewImg">🍽️</div>
-    <div class="view-body">
-      <div class="view-meta" id="viewMeta"></div>
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:10px;">
-        <div class="view-title" id="viewTitle"></div>
-        <button class="abs-close" style="position:relative;top:0;right:0;flex-shrink:0;margin-top:4px;" onclick="closeView()">✕</button>
-      </div>
-      <div class="view-by" id="viewBy"></div>
-      <div class="rsection"><h4>📖 Origin & History</h4><p id="viewOrigin"></p></div>
-      <div class="rsection"><h4>🍴 The Recipe</h4><pre id="viewRecipe"></pre></div>
-      <div id="viewPdfWrap" class="rsection" style="display:none;"><h4>📄 Attached File</h4><a class="pdf-link" id="viewPdfLink" target="_blank">📄 Download</a></div>
-      <!-- STAR RATING -->
-      <div class="rating-wrap" id="ratingWrap">
-        <h4>u2b50 Rate This Recipe</h4>
-        <div class="stars-display">
-          <div class="avg-stars" id="avgStars"></div>
-          <div class="avg-label" id="avgLabel"></div>
-        </div>
-        <div id="ratingInput"></div>
-      </div>
-
-      <div class="comments-wrap">
-        <h4>💬 Comments — Have you tried this?</h4>
-        <div id="commentsList"></div>
-        <div class="comment-form">
-          <div class="comment-row">
-            <input type="text" class="form-control" id="cName" placeholder="Your name">
-            <button class="comment-submit" onclick="postComment()">Post</button>
-          </div>
-          <textarea class="form-control" id="cText" placeholder="Share how it turned out, any tips, or just say you loved it!" style="min-height:68px;"></textarea>
-        </div>
-      </div>
-    </div>
-  </div>
+<div class="saving-indicator" id="saving-indicator">
+  <div class="spinner" style="width:14px;height:14px;border-width:2px"></div>
+  <span id="saving-msg">Saving…</span>
 </div>
-
-<div class="toast" id="toast"></div>
 
 <script>
-const SUPABASE_URL  = 'https://crfnjzchwaoxvxwqyevo.supabase.co';
-const SUPABASE_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNyZm5qemNod2FveHZ4d3F5ZXZvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzIyMDY3MTQsImV4cCI6MjA4Nzc4MjcxNH0.h9PqA_0Nsrj1_sU1iMkERZ9KeSoSe8OetCFhjrqS95s';
-const ADMIN_PW      = 'HubAdmin2025!';
-const HUB_DOMAINS   = ['hubinternational.com','hubprivateclient.com'];
+const SUPABASE_URL = 'https://zzpayiejynppqhtynlnk.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inp6cGF5aWVqeW5wcHFodHlubG5rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE5MTQwNzEsImV4cCI6MjA4NzQ5MDA3MX0.zV0eYc6raOOWP2ebuX0JJep-mzqWCn74rj0JWcjEaAI';
+const TABLE = 'hub_calendar';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-const THEMES = {
-  1:{e:'🍽️',t:'January Free Choice',d:'Share any recipe you love to kick off the new year'},
-  2:{e:'🥣',t:'Soups',d:'From creamy bisques to hearty broths — warm us up!'},
-  3:{e:'🍞',t:'Bread',d:'Loaves, buns, focaccia, flatbreads — all things bread'},
-  4:{e:'🫙',t:'Dips & Spreads',d:'Hummus, guac, spinach dip — the perfect crowd-pleasers'},
-  5:{e:'🥗',t:'Salads',d:'Fresh, vibrant, and full of flavour'},
-  6:{e:'🥂',t:'Appetizers & Snacks',d:'Bite-sized bites and party starters'},
-  7:{e:'🔥',t:'BBQ & Grilling',d:'Fire up the grill and share your best summer recipes'},
-  8:{e:'🍹',t:'Drinks — Cocktails & Mocktails',d:'Shake, stir, or blend your favourite beverages'},
-  9:{e:'🍝',t:'Pasta & Noodles',d:'From spaghetti to ramen — noodles of every kind'},
-  10:{e:'🌶️',t:'Chili & Stews',d:'Rich, hearty bowls perfect for cool autumn days'},
-  11:{e:'🫕',t:'Casseroles & One-Pot Meals',d:'Easy, comforting dishes that feed the whole family'},
-  12:{e:'🍪',t:'Cookies & Holiday Treats',d:'Festive sweets and baked goods for the holiday season'},
-};
-const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const OFFICES = [
+  { id:'markham',      name:'Markham',        color:'#0678d5' },
+  { id:'brantford',    name:'Brantford',       color:'#16a34a' },
+  { id:'london',       name:'London',          color:'#a3e635' },
+  { id:'sarnia',       name:'Sarnia',          color:'#ff6b6b' },
+  { id:'chatham',      name:'Chatham',         color:'#f97316' },
+  { id:'barrie',       name:'Barrie',          color:'#38bdf8' },
+  { id:'oakville',     name:'Oakville',        color:'#a78bfa' },
+  { id:'toronto',      name:'Toronto',         color:'#f472b6' },
+  { id:'stcatharines', name:"St. Catharines",  color:'#2dd4bf' },
+];
+const TYPE_COLOR = { 'team-member':'#f3b921', 'employee-off':'#00aeef', 'holiday':'#3ebd3e' };
+const TYPE_LABEL = { 'team-member':'Team Member Off', 'employee-off':'Employee Off', 'holiday':'Holiday / Stat Day' };
+const MONTHS   = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const DAYS_MON = ['Mon','Tue','Wed','Thu','Fri'];
+const DAYS_FULL = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 
-// ── STATE ──
-let db, recipes=[], currentRecipeId=null, currentUser=null, isAdmin=false;
-let selPhoto=null, selPdf=null, editingId=null, pendingSubmit=false;
-const now=new Date(), curM=now.getMonth()+1, curY=now.getFullYear();
-const mKey=`${curY}-${String(curM).padStart(2,'0')}`;
-const theme=THEMES[curM], mName=MONTHS[curM-1];
+const today    = new Date();
+let curYear    = today.getFullYear();
+let curMonth   = today.getMonth();
+let weekStart  = getMondayOf(today);
+const todayKey = fmtD(today.getFullYear(), today.getMonth(), today.getDate());
 
-// ── INIT ──
-document.addEventListener('DOMContentLoaded',async()=>{
-  document.getElementById('monthBadge').textContent=`${mName} ${curY}`;
-  document.getElementById('heroPill').textContent=`🗓️ ${mName} ${curY}`;
-  document.getElementById('themeIcon').textContent=theme.e;
-  document.getElementById('themeTitle').textContent=`${mName} Theme: ${theme.t}`;
-  document.getElementById('themeDesc').textContent=theme.d;
-  // Next month preview
-  const nextM = curM === 12 ? 1 : curM + 1;
-  const nextY = curM === 12 ? curY + 1 : curY;
-  const nextTheme = THEMES[nextM];
-  const nextName = MONTHS[nextM - 1];
-  document.getElementById('nextThemeIcon').textContent = nextTheme.e;
-  document.getElementById('nextThemeName').textContent = `${nextName} — ${nextTheme.t}`;
-  document.getElementById('monthName').textContent=mName;
-  db=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-  const saved=sessionStorage.getItem('hubEmail');
-  if(saved) applyUser(saved);
-  else document.getElementById('signInHdrBtn').style.display='block';
-  await Promise.all([loadRecipes(),loadTop20Banner(),loadHof()]);
-});
+let events        = [];
+let hiddenOffices = new Set(JSON.parse(localStorage.getItem('hub_hidden') || '[]'));
+let halfActive    = false;
+let editingId     = null;
+let selectedDay   = todayKey;
+let curView       = 'today';
 
-// ── USER ──
-function applyUser(email){
-  currentUser={email};
-  sessionStorage.setItem('hubEmail',email);
-  document.getElementById('userDisplay').textContent=email.split('@')[0];
-  document.getElementById('userArea').style.display='flex';
-  document.getElementById('signInHdrBtn').style.display='none';
-}
-function signOut(){
-  currentUser=null; sessionStorage.removeItem('hubEmail');
-  document.getElementById('userArea').style.display='none';
-  document.getElementById('signInHdrBtn').style.display='block';
-  showToast('Signed out'); renderRecipes();
-}
-function openSignIn(){ document.getElementById('signInModal').classList.add('open'); document.body.style.overflow='hidden'; setTimeout(()=>document.getElementById('siEmail').focus(),80); }
-function closeSignIn(){ document.getElementById('signInModal').classList.remove('open'); document.body.style.overflow=''; }
-function doSignIn(){
-  const email=document.getElementById('siEmail').value.trim().toLowerCase();
-  const domain=email.split('@')[1];
-  if(!email||!HUB_DOMAINS.includes(domain)){showToast('Please use a valid HUB email address',true);return;}
-  applyUser(email); closeSignIn();
-  showToast(`Welcome, ${email.split('@')[0].replace(/[._]/g,' ')}! 👋`);
-  if(pendingSubmit){pendingSubmit=false;openSubmit();}
-}
+function fmtD(y,m,d) { return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
+function getMondayOf(date) { const d=new Date(date); const day=d.getDay(); d.setDate(d.getDate()+(day===0?-6:1-day)); return d; }
+function hexToRgb(hex) { return `${parseInt(hex.slice(1,3),16)},${parseInt(hex.slice(3,5),16)},${parseInt(hex.slice(5,7),16)}`; }
 
-// ── ADMIN ──
-function openAdminLogin(){ document.getElementById('adminLoginModal').classList.add('open'); document.body.style.overflow='hidden'; setTimeout(()=>document.getElementById('adminPwInput').focus(),80); }
-function closeAdminLogin(){ document.getElementById('adminLoginModal').classList.remove('open'); document.body.style.overflow=''; document.getElementById('adminPwInput').value=''; }
-function checkAdminPw(){
-  if(document.getElementById('adminPwInput').value===ADMIN_PW){ isAdmin=true; closeAdminLogin(); enterAdmin(); }
-  else{ showToast('Incorrect password',true); document.getElementById('adminPwInput').value=''; }
-}
-function enterAdmin(){
-  document.getElementById('mainSite').style.display='none';
-  document.getElementById('adminPanel').classList.add('open');
-  buildMonthOptions();
-  loadAdminAll(); 
-}
-function closeAdmin(){
-  document.getElementById('adminPanel').classList.remove('open');
-  document.getElementById('mainSite').style.display='block';
-}
-function switchTab(btn,name){
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('panel-'+name).classList.add('active');
-  if(name==='top20') loadAdminTop20();
-  if(name==='hof') loadAdminHof();
-}
-
-function buildMonthOptions(){
-  const opts=[];
-  for(let y=curY;y>=curY;y--) for(let m=12;m>=1;m--){
-    if(y===curY&&m>curM) continue;
-    if(m===1) continue;
-    opts.push({k:`${y}-${String(m).padStart(2,'0')}`,l:`${MONTHS[m-1]} ${y}`});
-  }
-  ['filterAll','filterTop20'].forEach(id=>{
-    document.getElementById(id).innerHTML=opts.map(o=>`<option value="${o.k}"${o.k===mKey?' selected':''}>${o.l}</option>`).join('');
+function eventsOn(dk) {
+  return events.filter(e => {
+    if (!e.entry_type) return false;
+    if (e.entry_type==='holiday' && e.office==='all') { const end=e.end_date||e.entry_date; return dk>=e.entry_date&&dk<=end; }
+    if (hiddenOffices.has(e.office)) return false;
+    const end=e.end_date||e.entry_date; return dk>=e.entry_date&&dk<=end;
   });
 }
 
-async function loadAdminAll(){
-  const mk=document.getElementById('filterAll').value;
-  const {data}=await db.from('recipes').select('*').eq('month_key',mk).order('created_at',{ascending:false});
-  const el=document.getElementById('adminAllList');
-  if(!data||!data.length){el.innerHTML='<p style="color:rgba(255,255,255,0.4)">No recipes this month.</p>';return;}
-  const mTheme=THEMES[parseInt(mk.split('-')[1])];
-  el.innerHTML=data.map(r=>`
-    <div class="a-row">
-      <div class="a-thumb">${r.photo_url?`<img src="${r.photo_url}">`:(mTheme?mTheme.e:'🍽️')}</div>
-      <div class="a-info">
-        <div class="a-name">${esc(r.recipe_name)}</div>
-        <div class="a-meta">by ${esc(r.name)} · ${esc(r.office)} · ${esc(r.department)} · ${fd(r.created_at)}</div>
-      </div>
-      <div class="a-actions">
-        <button class="abtn abtn-blue" onclick="adminEdit('${r.id}')">✏️ Edit</button>
-        <button class="abtn abtn-red" onclick="adminDelete('${r.id}')">🗑️ Delete</button>
-      </div>
-    </div>`).join('');
+function showSaving(msg,type) {
+  const el=document.getElementById('saving-indicator');
+  el.className='saving-indicator show'+(type?' '+type:'');
+  document.getElementById('saving-msg').textContent=msg;
+  if(type==='success'||type==='error') setTimeout(()=>el.classList.remove('show'),3000);
 }
 
-async function adminDelete(id){
-  if(!confirm('Delete this recipe? This cannot be undone.')) return;
-  await db.from('recipes').delete().eq('id',id);
-  showToast('Deleted'); loadAdminAll(); loadRecipes();
+async function loadEvents() { const {data,error}=await sb.from(TABLE).select('*').order('entry_date'); if(error) throw error; events=data||[]; }
+async function createEvent(ev) { const {data,error}=await sb.from(TABLE).insert([ev]).select().single(); if(error) throw error; return data; }
+async function updateEvent(id,ev) { const {error}=await sb.from(TABLE).update(ev).eq('id',id); if(error) throw error; }
+async function deleteEvent(id) { const {error}=await sb.from(TABLE).delete().eq('id',id); if(error) throw error; }
+
+function subscribeRealtime() {
+  sb.channel('hub_calendar_changes')
+    .on('postgres_changes',{event:'*',schema:'public',table:TABLE},payload=>{
+      const {eventType,new:newRow,old:oldRow}=payload;
+      if(eventType==='INSERT'){if(!events.find(e=>e.id===newRow.id))events.push(newRow);}
+      else if(eventType==='UPDATE'){const idx=events.findIndex(e=>e.id===newRow.id);if(idx>=0)events[idx]=newRow;else events.push(newRow);}
+      else if(eventType==='DELETE'){events=events.filter(e=>e.id!==oldRow.id);}
+      renderView(); if(selectedDay) refreshWhoPanel();
+    }).subscribe();
 }
 
-async function adminEdit(id){
-  const {data}=await db.from('recipes').select('*').eq('id',id).single();
-  if(!data) return;
-  closeAdmin();
-  document.getElementById('mainSite').style.display='block';
-  // push into recipes array so edit works
-  if(!recipes.find(r=>r.id===id)) recipes.push(data);
-  openSubmit(data);
+function renderLegend() {
+  const el=document.getElementById('office-legend'); el.innerHTML='';
+  OFFICES.forEach(o=>{
+    const item=document.createElement('div'); item.className='office-item'+(hiddenOffices.has(o.id)?' hidden':'');
+    item.innerHTML=`<div class="o-dot" style="background:${o.color}"></div><span class="o-name">${o.name}</span>`;
+    item.addEventListener('click',()=>{ hiddenOffices.has(o.id)?hiddenOffices.delete(o.id):hiddenOffices.add(o.id); localStorage.setItem('hub_hidden',JSON.stringify([...hiddenOffices])); renderLegend(); renderView(); });
+    el.appendChild(item);
+  });
 }
 
-async function loadAdminTop20(){
-  const mk=document.getElementById('filterTop20').value;
-  const {data}=await db.from('recipes').select('*').eq('month_key',mk).order('created_at',{ascending:false});
-  const el=document.getElementById('adminTop20List');
-  if(!data||!data.length){el.innerHTML='<p style="color:rgba(255,255,255,0.4)">No recipes this month.</p>';return;}
-  const mTheme=THEMES[parseInt(mk.split('-')[1])];
-  el.innerHTML=data.map(r=>`
-    <div class="a-row ${r.is_top20?'highlighted':''}" id="arow-${r.id}">
-      <div class="a-thumb">${r.photo_url?`<img src="${r.photo_url}">`:(mTheme?mTheme.e:'🍽️')}</div>
-      <div class="a-info">
-        <div class="a-name">${esc(r.recipe_name)}</div>
-        <div class="a-meta">by ${esc(r.name)} · ${esc(r.office)}</div>
-      </div>
-      <div class="a-actions">
-        <button class="abtn abtn-gold ${r.is_top20?'on':''}" onclick="toggleTop20('${r.id}',${!!r.is_top20})">
-          ${r.is_top20?'⭐ In Top 20':'☆ Add to Top 20'}
-        </button>
-      </div>
-    </div>`).join('');
+document.getElementById('panel-toggle').addEventListener('click',()=>{
+  const panel=document.getElementById('side-panel'); panel.classList.toggle('collapsed');
+  document.getElementById('panel-toggle').textContent=panel.classList.contains('collapsed')?'▶':'◀';
+});
+function toggleSec(id) { const el=document.getElementById(id+'-content'),arr=document.getElementById(id+'-arr'),hidden=el.style.display==='none'; el.style.display=hidden?'':'none'; arr.classList.toggle('open',hidden); }
+
+function renderView() {
+  const wrap=document.getElementById('cal-wrap');
+  wrap.classList.remove('week-mode','today-mode');
+  if(curView==='today') { wrap.classList.add('today-mode'); renderToday(); }
+  else if(curView==='month') renderMonth();
+  else renderWeek();
+  renderLegend(); updateLabel();
 }
 
-async function toggleTop20(id,cur){
-  await db.from('recipes').update({is_top20:!cur}).eq('id',id);
-  showToast(!cur?'⭐ Added to Top 20!':'Removed from Top 20');
-  loadAdminTop20(); loadTop20Banner(); loadHof();
-}
-
-async function loadAdminHof(){
-  const {data}=await db.from('recipes').select('*').eq('is_top20',true).order('month_key',{ascending:false});
-  const el=document.getElementById('adminHofList');
-  if(!data||!data.length){el.innerHTML='<p style="color:rgba(255,255,255,0.4)">No Top 20 picks yet.</p>';return;}
-  el.innerHTML=renderHofHtml(data);
-}
-
-// ── RECIPES ──
-async function loadRecipes(){
-  const {data}=await db.from('recipes').select('*').eq('month_key',mKey).order('created_at',{ascending:false});
-  recipes=data||[]; renderRecipes();
-}
-
-function renderRecipes(){
-  const grid=document.getElementById('recipeGrid');
-  document.getElementById('recipeCount').textContent=`${recipes.length} recipe${recipes.length!==1?'s':''} shared`;
-  if(!recipes.length){
-    grid.innerHTML=`<div class="empty-state"><div class="emoji">${theme.e}</div><h3>No recipes yet this month!</h3><p>Be the first to share a ${theme.t.toLowerCase()} recipe.</p></div>`;
-    return;
+function updateLabel() {
+  const label=document.getElementById('month-label');
+  if(curView==='today') label.textContent=today.toLocaleDateString('en-CA',{weekday:'short',month:'long',day:'numeric'});
+  else if(curView==='month') label.textContent=`${MONTHS[curMonth]} ${curYear}`;
+  else {
+    const end=new Date(weekStart); end.setDate(end.getDate()+4);
+    label.textContent=weekStart.getMonth()===end.getMonth()?`${MONTHS[weekStart.getMonth()]} ${weekStart.getDate()}–${end.getDate()}, ${end.getFullYear()}`:`${MONTHS[weekStart.getMonth()]} ${weekStart.getDate()} – ${MONTHS[end.getMonth()]} ${end.getDate()}, ${end.getFullYear()}`;
   }
-  grid.innerHTML=recipes.map(r=>{
-    const mine=currentUser&&currentUser.email===r.submitted_by;
-    return `<div class="recipe-card" onclick="openView('${r.id}')">
-      <div class="card-image">${r.photo_url?`<img src="${esc(r.photo_url)}" alt="${esc(r.recipe_name)}">`:(theme.e)}</div>
-      <div class="card-body">
-        <div class="card-meta">
-          <span class="tag tag-dept">${esc(r.department)}</span>
-          <span class="tag tag-office">📍 ${esc(r.office)}</span>
-          ${mine?'<span class="tag tag-mine">✏️ Mine</span>':''}
-          ${r.is_top20?'<span class="tag tag-top20">⭐ Top 20</span>':''}
-        </div>
-        <div class="card-title">${esc(r.recipe_name)}</div>
-        <div class="card-author">by ${esc(r.name)}</div>
-        ${r.origin?`<div class="card-origin">${esc(r.origin)}</div>`:''}
-      </div>
-      <div class="card-footer">
-        <span class="comment-count">💬 <span id="cc-${r.id}">…</span></span>
-        <button class="view-btn">View Recipe →</button>
-      </div>
-    </div>`;
-  }).join('');
-  recipes.forEach(r=>loadCCount(r.id));
 }
 
-async function loadCCount(id){
-  const {count}=await db.from('comments').select('id',{count:'exact',head:true}).eq('recipe_id',id);
-  const el=document.getElementById('cc-'+id);
-  if(el) el.textContent=`${count||0} comments`;
-}
+// ── TODAY VIEW ─────────────────────────────────────────────────
+function renderToday() {
+  const wrap=document.getElementById('cal-wrap'); wrap.innerHTML='';
+  const todayEvs=eventsOn(todayKey);
+  const holidays=todayEvs.filter(e=>e.entry_type==='holiday');
+  const teamOff=todayEvs.filter(e=>e.entry_type==='team-member');
+  const empOff=todayEvs.filter(e=>e.entry_type==='employee-off');
+  const container=document.createElement('div'); container.className='today-view';
 
-// ── TOP 20 BANNER ──
-async function loadTop20Banner(){
-  const {data}=await db.from('recipes').select('*').eq('month_key',mKey).eq('is_top20',true);
-  const banner=document.getElementById('top20Banner');
-  if(!data||!data.length){banner.style.display='none';return;}
-  banner.style.display='block';
-  document.getElementById('top20Grid').innerHTML=data.map((r,i)=>`
-    <div class="top20-card" onclick="openView('${r.id}')">
-      <div class="top20-img">${r.photo_url?`<img src="${esc(r.photo_url)}">`:(theme.e)}<div class="top20-rank">#${i+1}</div></div>
-      <div class="top20-info"><div class="top20-name">${esc(r.recipe_name)}</div><div class="top20-by">by ${esc(r.name)}</div></div>
-    </div>`).join('');
-}
+  const hdr=document.createElement('div'); hdr.className='today-header';
+  const officeCount=new Set(todayEvs.filter(e=>e.office!=='all').map(e=>e.office)).size;
+  hdr.innerHTML=`<div class="today-headline">${DAYS_FULL[today.getDay()]}, <span>${MONTHS[today.getMonth()]} ${today.getDate()}</span></div><div class="today-subline">${todayEvs.length===0?'Everyone is in today 🎉':`${todayEvs.length} absence${todayEvs.length!==1?'s':''} across ${officeCount} office${officeCount!==1?'s':''} today`}</div>`;
+  container.appendChild(hdr);
 
-// ── HALL OF FAME ──
-async function loadHof(){
-  const {data}=await db.from('recipes').select('*').eq('is_top20',true).order('month_key',{ascending:false});
-  const el=document.getElementById('hofContent');
-  if(!data||!data.length){el.innerHTML='<p style="color:rgba(255,255,255,0.4);font-size:15px;">No Hall of Fame picks yet — check back after the first month ends!</p>';return;}
-  el.innerHTML=renderHofHtml(data);
-}
+  if(todayEvs.length>0) {
+    const summary=document.createElement('div'); summary.className='today-summary';
+    if(holidays.length) summary.innerHTML+=`<div class="summary-pill"><div class="summary-pill-dot" style="background:var(--holiday)"></div><span class="summary-pill-count">${holidays.length}</span><span class="summary-pill-label">Holiday</span></div>`;
+    if(teamOff.length)  summary.innerHTML+=`<div class="summary-pill"><div class="summary-pill-dot" style="background:var(--team-member)"></div><span class="summary-pill-count">${teamOff.length}</span><span class="summary-pill-label">Team Member${teamOff.length!==1?'s':''} Off</span></div>`;
+    if(empOff.length)   summary.innerHTML+=`<div class="summary-pill"><div class="summary-pill-dot" style="background:var(--employee-off)"></div><span class="summary-pill-count">${empOff.length}</span><span class="summary-pill-label">Employee${empOff.length!==1?'s':''} Off</span></div>`;
+    container.appendChild(summary);
+  }
 
-function renderHofHtml(data){
-  const groups={};
-  data.forEach(r=>{if(!groups[r.month_key])groups[r.month_key]=[];groups[r.month_key].push(r);});
-  return Object.keys(groups).sort((a,b)=>b.localeCompare(a)).map(mk=>{
-    const [y,m]=mk.split('-'); const mt=THEMES[parseInt(m)]||{e:'🍽️',t:''};
-    return `<div class="hof-month">
-      <div class="hof-month-title">${mt.e} ${MONTHS[parseInt(m)-1]} ${y} <span>— ${mt.t}</span></div>
-      <div class="hof-grid">${groups[mk].map((r,i)=>`
-        <div class="hof-card" onclick="openView('${r.id}')">
-          <div class="hof-img">${r.photo_url?`<img src="${esc(r.photo_url)}">`:(mt.e)}<div class="hof-rank">#${i+1}</div></div>
-          <div class="hof-info"><div class="hof-name">${esc(r.recipe_name)}</div><div class="hof-by">by ${esc(r.name)} · ${esc(r.office)}</div></div>
-        </div>`).join('')}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ── SUBMIT / EDIT ──
-function handleSubmitClick(){
-  if(!currentUser){pendingSubmit=true;openSignIn();return;}
-  openSubmit();
-}
-function openSubmit(recipe=null){
-  editingId=recipe?recipe.id:null;
-  document.getElementById('submitTitle').textContent=recipe?'✏️ Edit Your Recipe':'🍴 Submit Your Recipe';
-  document.getElementById('submitBtn').textContent=recipe?'💾 Save Changes':'✅ Share My Recipe';
-  if(recipe){
-    document.getElementById('fName').value=recipe.name||'';
-    document.getElementById('fOffice').value=recipe.office||'';
-    document.getElementById('fDept').value=recipe.department||'';
-    document.getElementById('fRecipeName').value=recipe.recipe_name||'';
-    document.getElementById('fOrigin').value=recipe.origin||'';
-    document.getElementById('fRecipe').value=recipe.recipe_text||'';
+  if(todayEvs.length===0) {
+    const empty=document.createElement('div'); empty.className='today-no-entries';
+    empty.innerHTML=`<div class="big-icon">✅</div><p>No absences today — everyone is in!</p>`;
+    container.appendChild(empty);
   } else {
-    ['fName','fOffice','fDept','fRecipeName','fOrigin','fRecipe'].forEach(id=>document.getElementById(id).value='');
-    if(currentUser){
-      document.getElementById('fName').value=currentUser.email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
-    }
+    holidays.forEach(ev=>{ const banner=document.createElement('div'); banner.className='today-holiday-banner'; banner.innerHTML=`<div class="today-holiday-icon">🎉</div><div><div class="today-holiday-name">${ev.holiday_name||'Holiday'}</div><div class="today-holiday-sub">Applies to all offices</div></div>`; container.appendChild(banner); });
+    OFFICES.forEach(o=>{
+      const offEvs=todayEvs.filter(e=>e.office===o.id); if(!offEvs.length) return;
+      const section=document.createElement('div'); section.className='today-office-section';
+      section.innerHTML=`<div class="today-office-header"><div class="today-office-color" style="background:${o.color}"></div><span class="today-office-name">${o.name}</span><span class="today-office-count">${offEvs.length} absence${offEvs.length!==1?'s':''}</span></div>`;
+      offEvs.forEach(ev=>{
+        const color=TYPE_COLOR[ev.entry_type];
+        const dateStr=ev.end_date&&ev.end_date!==ev.entry_date?`${ev.entry_date} → ${ev.end_date}`:ev.entry_date;
+        const row=document.createElement('div'); row.className='today-entry-row';
+        row.innerHTML=`<div class="today-entry-type-dot" style="background:${color}"></div><div class="today-entry-info"><div class="today-entry-name">${ev.entry_name||TYPE_LABEL[ev.entry_type]}${ev.half_day?'<span class="today-entry-half">½ Day</span>':''}</div><div class="today-entry-type">${TYPE_LABEL[ev.entry_type]}</div><div class="today-entry-dates">📅 ${dateStr}</div>${ev.backup?`<div class="today-entry-backup">↩ Backup: ${ev.backup}</div>`:''}${ev.forward_to?`<div class="today-entry-fwd">📞 Forward to: ${ev.forward_to}</div>`:''}${ev.note?`<div class="today-entry-note">${ev.note}</div>`:''}</div>`;
+        row.addEventListener('click',()=>openEdit(ev.id));
+        section.appendChild(row);
+      });
+      container.appendChild(section);
+    });
   }
-  document.getElementById('photoPreview').textContent='';
-  document.getElementById('pdfPreview').textContent='';
-  selPhoto=null; selPdf=null;
-  document.getElementById('submitModal').classList.add('open');
-  document.body.style.overflow='hidden';
-}
-function closeSubmit(){ document.getElementById('submitModal').classList.remove('open'); document.body.style.overflow=''; }
-
-function handlePhoto(inp){
-  const f=inp.files[0]; if(!f) return;
-  if(f.size>5*1024*1024){showToast('Photo must be under 5MB',true);return;}
-  selPhoto=f; document.getElementById('photoPreview').textContent=`✅ ${f.name}`;
-}
-function handlePdf(inp){
-  const f=inp.files[0]; if(!f) return;
-  selPdf=f; document.getElementById('pdfPreview').textContent=`✅ ${f.name}`;
+  wrap.appendChild(container);
 }
 
-async function uploadFile(file,folder){
-  const ext=file.name.split('.').pop();
-  const path=`${folder}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
-  const {error}=await db.storage.from('recipe-files').upload(path,file);
-  if(error) throw error;
-  return db.storage.from('recipe-files').getPublicUrl(path).data.publicUrl;
+// ── Month view ─────────────────────────────────────────────────
+function renderMonth() {
+  const wrap=document.getElementById('cal-wrap'); wrap.innerHTML='';
+  const cal=document.createElement('div'); cal.className='cal-month';
+  const hdrs=document.createElement('div'); hdrs.className='day-headers';
+  DAYS_MON.forEach(d=>{const h=document.createElement('div');h.className='day-hdr';h.textContent=d;hdrs.appendChild(h);});
+  cal.appendChild(hdrs);
+  const firstDow=new Date(curYear,curMonth,1).getDay();
+  const offset=firstDow===0?1:firstDow===1?0:-(firstDow-1);
+  for(let week=0;week<6;week++){
+    const weekDates=[]; let hasMain=false;
+    for(let dow=0;dow<5;dow++){
+      const date=new Date(curYear,curMonth,1+offset+week*7+dow);
+      weekDates.push({y:date.getFullYear(),m:date.getMonth(),d:date.getDate(),other:date.getMonth()!==curMonth});
+      if(!weekDates[dow].other) hasMain=true;
+    }
+    if(!hasMain&&week>3) break;
+    const weekRow=document.createElement('div'); weekRow.className='week-row';
+    const cells=document.createElement('div'); cells.className='week-cells';
+    weekDates.forEach(wd=>{
+      const dk=fmtD(wd.y,wd.m,wd.d);
+      const cell=document.createElement('div');
+      cell.className='day-cell'+(wd.other?' other-month':'')+(dk===todayKey?' today':'')+(dk===selectedDay?' selected':'');
+      cell.innerHTML=`<div class="day-num">${wd.d}</div>`;
+      cell.addEventListener('click',()=>selectDay(dk,wd.y,wd.m,wd.d));
+      cell.addEventListener('dblclick',()=>openAdd(dk));
+      cells.appendChild(cell);
+    });
+    weekRow.appendChild(cells);
+    const {overlay,slotCount}=buildWeekEvents(weekDates);
+    const rowH=Math.max(60, 26 + slotCount*26 + 10);
+    cells.querySelectorAll('.day-cell').forEach(c=>c.style.minHeight=rowH+'px');
+    overlay.style.height=rowH+'px';
+    weekRow.appendChild(overlay);
+    cal.appendChild(weekRow);
+  }
+  wrap.appendChild(cal);
 }
 
-async function saveRecipe(){
-  const btn=document.getElementById('submitBtn');
-  const name=document.getElementById('fName').value.trim();
-  const office=document.getElementById('fOffice').value.trim();
-  const dept=document.getElementById('fDept').value.trim();
-  const rname=document.getElementById('fRecipeName').value.trim();
-  const origin=document.getElementById('fOrigin').value.trim();
-  const rtext=document.getElementById('fRecipe').value.trim();
-  if(!name||!office||!dept||!rname||!rtext){showToast('Please fill in all required fields',true);return;}
-  btn.disabled=true; btn.textContent='⏳ Saving…';
+function buildWeekEvents(weekDates) {
+  const overlay=document.createElement('div'); overlay.className='week-events';
+  const wS=fmtD(weekDates[0].y,weekDates[0].m,weekDates[0].d);
+  const wE=fmtD(weekDates[4].y,weekDates[4].m,weekDates[4].d);
+  const weekEvs=events.filter(e=>{
+    if(!e.entry_type) return false;
+    if(hiddenOffices.has(e.office)&&!(e.entry_type==='holiday'&&e.office==='all')) return false;
+    return e.entry_date<=wE&&(e.end_date||e.entry_date)>=wS;
+  }).sort((a,b)=>{
+    const aL=(new Date(a.end_date||a.entry_date)-new Date(a.entry_date))/86400000;
+    const bL=(new Date(b.end_date||b.entry_date)-new Date(b.entry_date))/86400000;
+    return bL!==aL?bL-aL:a.entry_date.localeCompare(b.entry_date);
+  });
+  const slots=[0,0,0,0,0]; let maxSlot=0;
+  weekEvs.forEach(ev=>{
+    const es=ev.entry_date,ee=ev.end_date||ev.entry_date;
+    let sc=-1,ec=-1;
+    weekDates.forEach((wd,i)=>{const dk=fmtD(wd.y,wd.m,wd.d);if(dk>=es&&dk<=ee){if(sc===-1)sc=i;ec=i;}});
+    if(sc===-1) return;
+    const span=ec-sc+1,tColor=TYPE_COLOR[ev.entry_type]||'#888',office=OFFICES.find(o=>o.id===ev.office),oColor=office?office.color:tColor,borderColor=ev.entry_type==='holiday'?tColor:oColor;
+    const slotRow=Math.max(...slots.slice(sc,ec+1)); if(slotRow+1>maxSlot) maxSlot=slotRow+1;
+    const cL=es<wS,cR=ee>wE&&ec===4;
+    const chip=document.createElement('div');
+    chip.className='span-chip'+(cL&&cR?' cont-both':(!cL&&cR?' cont-right':(cL&&!cR?' cont-left':'')));
+    chip.style.cssText=`grid-column:${sc+1}/span ${span};grid-row:${slotRow+1};border-left-color:${borderColor};color:${tColor};background:rgba(${hexToRgb(tColor)},0.15);`;
+    const dn=ev.entry_type==='holiday'?(ev.holiday_name||'Holiday'):(ev.entry_name||TYPE_LABEL[ev.entry_type]);
+    chip.innerHTML=`<div class="chip-dot" style="background:${tColor}"></div><span class="chip-name">${dn}</span>${ev.half_day?'<span class="chip-half">½</span>':''}${span===1&&office?`<span class="chip-office-tag" style="color:${oColor}">${office.name}</span>`:''}`;
+    chip.addEventListener('click',e=>{e.stopPropagation();openEdit(ev.id);});
+    overlay.appendChild(chip);
+    for(let i=sc;i<=ec;i++) slots[i]=slotRow+1;
+  });
+  // maxSlot should be the max of all column slots
+  const trueMax = Math.max(maxSlot, ...slots);
+  return {overlay,slotCount:trueMax};
+}
+
+// ── Week view ──────────────────────────────────────────────────
+function renderWeek() {
+  const wrap=document.getElementById('cal-wrap'); wrap.innerHTML=''; wrap.classList.add('week-mode');
+  const ww=document.createElement('div'); ww.className='week-wrap';
+  const hdrs=document.createElement('div'); hdrs.className='week-hdrs';
+  const wg=document.createElement('div'); wg.className='week-grid';
+  for(let i=0;i<5;i++){
+    const d=new Date(weekStart); d.setDate(d.getDate()+i);
+    const dk=fmtD(d.getFullYear(),d.getMonth(),d.getDate());
+    const hdr=document.createElement('div'); hdr.className='day-hdr'; hdr.textContent=`${DAYS_MON[i]} ${d.getDate()}`; hdrs.appendChild(hdr);
+    const cell=document.createElement('div');
+    cell.className='week-cell'+(dk===todayKey?' today':'')+(dk===selectedDay?' selected':'');
+    cell.innerHTML=`<div class="wc-day-num">${d.getDate()}</div>`;
+    eventsOn(dk).forEach(ev=>cell.appendChild(buildWeekChip(ev)));
+    cell.addEventListener('click',e=>{if(e.target.closest('.week-chip'))return;selectDay(dk,d.getFullYear(),d.getMonth(),d.getDate());});
+    cell.addEventListener('dblclick',e=>{if(e.target.closest('.week-chip'))return;openAdd(dk);});
+    cell.querySelectorAll('.week-chip').forEach(c=>c.addEventListener('click',e=>{e.stopPropagation();openEdit(c.dataset.evid);}));
+    wg.appendChild(cell);
+  }
+  ww.appendChild(hdrs); ww.appendChild(wg); wrap.appendChild(ww);
+}
+
+function buildWeekChip(ev) {
+  const office=OFFICES.find(o=>o.id===ev.office),tColor=TYPE_COLOR[ev.entry_type]||'#888',oColor=office?office.color:'#555';
+  const chip=document.createElement('div'); chip.className='week-chip'; chip.dataset.evid=ev.id;
+  chip.style.borderLeftColor=ev.entry_type==='holiday'?tColor:oColor; chip.style.color=tColor;
+  const r1=document.createElement('div'); r1.className='wc-row1';
+  r1.innerHTML=`<div class="wc-dot" style="background:${tColor}"></div>`;
+  const nm=document.createElement('span'); nm.className='wc-name'; nm.textContent=ev.entry_type==='holiday'?(ev.holiday_name||'Holiday'):(ev.entry_name||TYPE_LABEL[ev.entry_type]); r1.appendChild(nm);
+  if(ev.half_day) r1.innerHTML+=`<span class="wc-half">½</span>`;
+  chip.appendChild(r1);
+  const r2=document.createElement('div'); r2.className='wc-row2';
+  if(ev.entry_type==='holiday'){r2.innerHTML=`<span class="wc-office" style="color:var(--holiday)">All Offices</span>`;}
+  else if(office){r2.innerHTML=`<span class="wc-office" style="color:${oColor}">${office.name}</span>`;if(ev.backup)r2.innerHTML+=`<span class="wc-backup">${ev.backup}</span>`;if(ev.forward_to)r2.innerHTML+=`<span class="wc-fwd">${ev.forward_to}</span>`;}
+  chip.appendChild(r2); return chip;
+}
+
+// ── Who's Off panel ────────────────────────────────────────────
+function selectDay(dk,y,m,d) {
+  selectedDay=dk; if(curView==='month') renderMonth();
+  document.getElementById('wo-date').textContent=new Date(y,m,d).toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric'});
+  renderWhoPanel(dk);
+  const btn=document.getElementById('day-add-btn'); btn.style.display=''; btn.onclick=()=>openAdd(dk);
+}
+function refreshWhoPanel() {
+  if(!selectedDay) return;
+  const [y,m,d]=selectedDay.split('-').map(Number);
+  renderWhoPanel(selectedDay);
+  document.getElementById('wo-date').textContent=new Date(y,m-1,d).toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric'});
+}
+function renderWhoPanel(dk) {
+  const content=document.getElementById('wo-entries'); content.innerHTML='';
+  const dayEvs=eventsOn(dk);
+  if(!dayEvs.length){content.innerHTML='<div class="whosoff-empty">No entries for this day.</div>';return;}
+  const hols=dayEvs.filter(e=>e.entry_type==='holiday');
+  if(hols.length){const g=makeWOGroup('All Offices','#3ebd3e');hols.forEach(ev=>g.appendChild(makeWOEntry(ev,'#3ebd3e')));content.appendChild(g);}
+  OFFICES.forEach(o=>{const evs=dayEvs.filter(e=>e.office===o.id);if(!evs.length)return;const g=makeWOGroup(o.name,o.color);evs.forEach(ev=>g.appendChild(makeWOEntry(ev,TYPE_COLOR[ev.entry_type])));content.appendChild(g);});
+}
+function makeWOGroup(title,color){const g=document.createElement('div');g.className='wo-group';const t=document.createElement('div');t.className='wo-group-title';t.style.color=color;t.textContent=title;g.appendChild(t);return g;}
+function makeWOEntry(ev,color){
+  const row=document.createElement('div');row.className='wo-entry';
+  row.innerHTML=`<div class="wo-dot" style="background:${color}"></div><div><div class="wo-name">${ev.entry_type==='holiday'?(ev.holiday_name||'Holiday'):(ev.entry_name||TYPE_LABEL[ev.entry_type])}${ev.half_day?'<span class="wo-half">½</span>':''}</div><div class="wo-type">${TYPE_LABEL[ev.entry_type]}${ev.note?' · '+ev.note:''}</div>${ev.backup?`<div class="wo-backup">↩ Backup: ${ev.backup}</div>`:''}${ev.forward_to?`<div class="wo-fwd">📞 Fwd to: ${ev.forward_to}</div>`:''}</div>`;
+  row.addEventListener('click',()=>openEdit(ev.id)); return row;
+}
+
+// ── Search ─────────────────────────────────────────────────────
+document.getElementById('search-input').addEventListener('input',function(){
+  const q=this.value.trim().toLowerCase(),results=document.getElementById('search-results');
+  if(!q){results.classList.remove('show');return;}
+  const matches=events.filter(e=>(e.entry_name||e.holiday_name||'').toLowerCase().includes(q));
+  results.innerHTML='';
+  if(!matches.length){results.innerHTML='<div class="search-empty">No results found</div>';}
+  else{matches.slice(0,8).forEach(ev=>{
+    const office=OFFICES.find(o=>o.id===ev.office),color=TYPE_COLOR[ev.entry_type]||'#888',oColor=office?office.color:'#888';
+    const item=document.createElement('div');item.className='search-result-item';
+    item.innerHTML=`<div class="sr-name"><span class="sr-dot" style="background:${color}"></span>${ev.entry_type==='holiday'?(ev.holiday_name||'Holiday'):(ev.entry_name||'')}</div><div class="sr-meta"><span style="color:${oColor}">${office?office.name:'All Offices'}</span> · ${TYPE_LABEL[ev.entry_type]} · ${ev.entry_date}</div>`;
+    item.addEventListener('click',()=>{const [y,m,d]=ev.entry_date.split('-').map(Number);curYear=y;curMonth=m-1;curView='month';document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active'));document.querySelector('[data-view="month"]').classList.add('active');results.classList.remove('show');document.getElementById('search-input').value='';renderView();setTimeout(()=>selectDay(ev.entry_date,y,m-1,d),50);});
+    results.appendChild(item);
+  });}
+  results.classList.add('show');
+});
+document.addEventListener('click',e=>{if(!document.getElementById('search-wrap').contains(e.target))document.getElementById('search-results').classList.remove('show');});
+
+// ── Modal ──────────────────────────────────────────────────────
+function closeAll(){document.querySelectorAll('.modal-overlay').forEach(m=>m.classList.remove('open'));}
+function setHalf(val){halfActive=val;document.getElementById('half-toggle').classList.toggle('active',val);}
+function syncForm(){
+  const type=document.getElementById('entry-type').value,isHol=type==='holiday',isEmp=type==='employee-off';
+  document.getElementById('name-row').style.display=isHol?'none':'';
+  document.getElementById('backup-row').style.display=isEmp?'':'none';
+  document.getElementById('forward-row').style.display=isEmp?'':'none';
+  document.getElementById('holiday-row').style.display=isHol?'':'none';
+  document.getElementById('office-row').style.display=isHol?'none':'';
+  document.getElementById('name-lbl').textContent=type==='team-member'?'Team Member Name':'Employee Name';
+}
+function openAdd(prefillDate){
+  prefillDate=prefillDate||'';editingId=null;
+  document.getElementById('modal-title').textContent='Add Entry';
+  document.getElementById('del-btn').style.display='none';
+  document.getElementById('entry-type').value='team-member';
+  document.getElementById('entry-office').value=OFFICES[0].id;
+  ['entry-name','entry-backup','entry-forward','entry-holiday-name','entry-end-date','entry-note'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('entry-date').value=prefillDate;
+  document.getElementById('save-btn').disabled=false;
+  setHalf(false);syncForm();
+  document.getElementById('event-modal').classList.add('open');
+}
+function openEdit(evId){
+  const ev=events.find(e=>e.id===evId);if(!ev)return;
+  editingId=ev.id;
+  document.getElementById('modal-title').textContent='Edit Entry';
+  document.getElementById('del-btn').style.display='';document.getElementById('del-btn').disabled=false;
+  document.getElementById('entry-type').value=ev.entry_type;
+  document.getElementById('entry-office').value=ev.office||OFFICES[0].id;
+  document.getElementById('entry-name').value=ev.entry_name||'';
+  document.getElementById('entry-backup').value=ev.backup||'';
+  document.getElementById('entry-forward').value=ev.forward_to||'';
+  document.getElementById('entry-holiday-name').value=ev.holiday_name||'';
+  document.getElementById('entry-date').value=ev.entry_date||'';
+  document.getElementById('entry-end-date').value=ev.end_date||'';
+  document.getElementById('entry-note').value=ev.note||'';
+  document.getElementById('save-btn').disabled=false;
+  setHalf(!!ev.half_day);syncForm();
+  document.getElementById('event-modal').classList.add('open');
+}
+function populateOfficeSelect(){const sel=document.getElementById('entry-office');sel.innerHTML='';OFFICES.forEach(o=>{const opt=document.createElement('option');opt.value=o.id;opt.textContent=o.name;sel.appendChild(opt);});}
+
+document.getElementById('save-btn').addEventListener('click',async()=>{
+  const type=document.getElementById('entry-type').value,date=document.getElementById('entry-date').value;
+  if(!date){alert('Please select a date.');return;}
+  const payload={entry_type:type,office:type==='holiday'?'all':document.getElementById('entry-office').value,entry_date:date,end_date:document.getElementById('entry-end-date').value||null,entry_name:type!=='holiday'?document.getElementById('entry-name').value.trim():null,holiday_name:type==='holiday'?document.getElementById('entry-holiday-name').value.trim():null,backup:type==='employee-off'?document.getElementById('entry-backup').value.trim()||null:null,forward_to:type==='employee-off'?document.getElementById('entry-forward').value.trim()||null:null,half_day:halfActive,note:document.getElementById('entry-note').value.trim()||null};
+  document.getElementById('save-btn').disabled=true;showSaving('Saving…');closeAll();
+  try{if(editingId){await updateEvent(editingId,payload);}else{await createEvent(payload);}showSaving('Saved ✓','success');}
+  catch(err){console.error(err);showSaving('Save failed','error');document.getElementById('save-btn').disabled=false;}
+});
+document.getElementById('del-btn').addEventListener('click',async()=>{
+  if(!editingId)return;document.getElementById('del-btn').disabled=true;showSaving('Deleting…');closeAll();
+  try{await deleteEvent(editingId);editingId=null;showSaving('Deleted ✓','success');}
+  catch(err){console.error(err);showSaving('Delete failed','error');document.getElementById('del-btn').disabled=false;}
+});
+document.getElementById('cancel-btn').addEventListener('click',closeAll);
+document.querySelectorAll('.modal-overlay').forEach(ov=>ov.addEventListener('click',e=>{if(e.target===ov)closeAll();}));
+document.getElementById('add-btn').addEventListener('click',()=>openAdd());
+
+// ── Nav ────────────────────────────────────────────────────────
+document.getElementById('prev-btn').addEventListener('click',()=>{
+  if(curView==='week'){weekStart=new Date(weekStart);weekStart.setDate(weekStart.getDate()-7);}
+  else if(curView==='month'){curMonth--;if(curMonth<0){curMonth=11;curYear--;}}
+  renderView();
+});
+document.getElementById('next-btn').addEventListener('click',()=>{
+  if(curView==='week'){weekStart=new Date(weekStart);weekStart.setDate(weekStart.getDate()+7);}
+  else if(curView==='month'){curMonth++;if(curMonth>11){curMonth=0;curYear++;}}
+  renderView();
+});
+document.getElementById('today-nav-btn').addEventListener('click',()=>{
+  curYear=today.getFullYear();curMonth=today.getMonth();weekStart=getMondayOf(today);
+  curView='today';document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active'));document.querySelector('[data-view="today"]').classList.add('active');
+  renderView();
+});
+document.getElementById('week-btn').addEventListener('click',()=>{
+  weekStart=getMondayOf(today);curView='week';
+  document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active'));document.querySelector('[data-view="week"]').classList.add('active');
+  renderView();
+});
+document.querySelectorAll('.view-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{document.querySelectorAll('.view-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');curView=btn.dataset.view;renderView();});
+});
+
+// ── Init ───────────────────────────────────────────────────────
+(async()=>{
   try{
-    let photoUrl=null,pdfUrl=null;
-    if(selPhoto) photoUrl=await uploadFile(selPhoto,'photos');
-    if(selPdf)   pdfUrl=await uploadFile(selPdf,'files');
-    if(editingId){
-      const upd={name,office,department:dept,recipe_name:rname,origin,recipe_text:rtext};
-      if(photoUrl) upd.photo_url=photoUrl;
-      if(pdfUrl)   upd.pdf_url=pdfUrl;
-      const {error}=await db.from('recipes').update(upd).eq('id',editingId);
-      if(error) throw error;
-      showToast('✅ Recipe updated!');
-    } else {
-      const {error}=await db.from('recipes').insert({name,office,department:dept,recipe_name:rname,origin,recipe_text:rtext,photo_url:photoUrl,pdf_url:pdfUrl,month_key:mKey,submitted_by:currentUser?currentUser.email:null});
-      if(error) throw error;
-      showToast('🎉 Recipe submitted! Thank you!');
-    }
-    closeSubmit(); await loadRecipes();
-  } catch(e){console.error(e);showToast('Save failed — please try again',true);}
-  finally{btn.disabled=false;btn.textContent=editingId?'💾 Save Changes':'✅ Share My Recipe';}
-}
-
-// ── VIEW ──
-async function openView(id){
-  // Look in current month recipes first, then fetch
-  let r=recipes.find(x=>x.id===id);
-  if(!r){const {data}=await db.from('recipes').select('*').eq('id',id).single();r=data;}
-  if(!r) return;
-  currentRecipeId=id;
-  const rTheme=THEMES[parseInt((r.month_key||mKey).split('-')[1])]||theme;
-  document.getElementById('viewImg').innerHTML=r.photo_url?`<img src="${esc(r.photo_url)}" alt="${esc(r.recipe_name)}">`:(rTheme.e);
-  const mine=currentUser&&currentUser.email===r.submitted_by;
-  document.getElementById('viewMeta').innerHTML=`
-    <span class="tag tag-dept">${esc(r.department)}</span>
-    <span class="tag tag-office">📍 ${esc(r.office)}</span>
-    ${r.is_top20?'<span class="tag tag-top20">⭐ Top 20</span>':''}
-    ${mine?`<button class="edit-own-btn" onclick="closeView();openSubmit(recipes.find(x=>x.id==='${r.id}')||r)">✏️ Edit My Recipe</button>`:''}`;
-  document.getElementById('viewTitle').textContent=r.recipe_name;
-  document.getElementById('viewBy').textContent=`Shared by ${r.name} · ${fd(r.created_at)}`;
-  document.getElementById('viewOrigin').textContent=r.origin||'No origin story provided.';
-  document.getElementById('viewRecipe').textContent=r.recipe_text;
-  if(r.pdf_url){document.getElementById('viewPdfWrap').style.display='block';document.getElementById('viewPdfLink').href=r.pdf_url;}
-  else document.getElementById('viewPdfWrap').style.display='none';
-  if(currentUser) document.getElementById('cName').value=currentUser.email.split('@')[0].replace(/[._]/g,' ').replace(/\b\w/g,c=>c.toUpperCase());
-  document.getElementById('viewModal').classList.add('open');
-  document.body.style.overflow='hidden';
-  await loadComments(id);
-  await loadRatings(id);
-}
-function closeView(){ document.getElementById('viewModal').classList.remove('open'); document.body.style.overflow=''; currentRecipeId=null; }
-
-// ── COMMENTS ──
-async function loadComments(id){
-  const {data}=await db.from('comments').select('*').eq('recipe_id',id).order('created_at',{ascending:true});
-  const el=document.getElementById('commentsList');
-  if(!data||!data.length){el.innerHTML='<p style="color:rgba(255,255,255,0.4);font-size:14px;margin-bottom:12px;">No comments yet — be the first!</p>';return;}
-  el.innerHTML=data.map(c=>`<div class="comment-item"><div class="comment-author">💬 ${esc(c.author)}</div><div class="comment-date">${fd(c.created_at)}</div><div class="comment-text">${esc(c.comment)}</div></div>`).join('');
-}
-async function postComment(){
-  const author=document.getElementById('cName').value.trim();
-  const comment=document.getElementById('cText').value.trim();
-  if(!author||!comment){showToast('Please enter your name and comment',true);return;}
-  await db.from('comments').insert({recipe_id:currentRecipeId,author,comment});
-  document.getElementById('cText').value='';
-  showToast('💬 Comment posted!');
-  await loadComments(currentRecipeId);
-  await loadCCount(currentRecipeId);
-}
-
-// ── PAST MONTHS ──
-let pastMonthsOpen=false, browsingKey=null;
-function togglePastMonths(){
-  pastMonthsOpen=!pastMonthsOpen;
-  const bar=document.getElementById("pastMonthsBar");
-  const btn=document.querySelector(".past-months-btn");
-  if(pastMonthsOpen){
-    bar.style.display="block";
-    btn.classList.add("active");
-    buildPastMonthBtns();
-  } else {
-    bar.style.display="none";
-    btn.classList.remove("active");
-    if(browsingKey){ browsingKey=null; loadRecipes(); document.getElementById("monthName").textContent=mName; }
+    document.getElementById('loading-msg').textContent='Loading calendar…';
+    await loadEvents();populateOfficeSelect();renderLegend();renderView();subscribeRealtime();
+    document.getElementById('loading-overlay').style.display='none';
+    document.getElementById('wo-date').textContent=today.toLocaleDateString('en-CA',{weekday:'long',month:'long',day:'numeric'});
+    renderWhoPanel(todayKey);
+    document.getElementById('day-add-btn').style.display='';
+    document.getElementById('day-add-btn').onclick=()=>openAdd(todayKey);
+  }catch(err){
+    console.error(err);
+    document.getElementById('loading-msg').textContent='Failed to connect. Please refresh and try again.';
   }
-}
-function buildPastMonthBtns(){
-  const container=document.getElementById("pastMonthBtns");
-  const btns=[];
-  btns.push(`<button class="month-pill-btn ${!browsingKey?"active":""}" onclick="browseMonth(null)">🗓️ ${mName} ${curY} (Current)</button>`);
-  for(let y=curY;y>=curY;y--){
-    for(let m=12;m>=1;m--){
-      if(y===curY&&m>=curM) continue;
-      if(m===1) continue;
-      const k=`${y}-${String(m).padStart(2,"0")}`;
-      const label=`${MONTHS[m-1]} ${y}`;
-      btns.push(`<button class="month-pill-btn ${browsingKey===k?"active":""}" onclick="browseMonth('${k}')">${THEMES[m]?THEMES[m].e:"🍽️"} ${label}</button>`);
-    }
-  }
-  container.innerHTML=btns.join("");
-}
-async function browseMonth(key){
-  browsingKey=key;
-  buildPastMonthBtns();
-  if(!key){
-    document.getElementById("monthName").textContent=mName;
-    await loadRecipes();
-    return;
-  }
-  const [y,m]=key.split("-");
-  const t=THEMES[parseInt(m)]||{e:"🍽️",t:""};
-  document.getElementById("monthName").textContent=`${MONTHS[parseInt(m)-1]} ${y}`;
-  const grid=document.getElementById("recipeGrid");
-  grid.innerHTML=`<div class="loading"><div class="spinner"></div><br>Loading…</div>`;
-  const {data}=await db.from("recipes").select("*").eq("month_key",key).order("created_at",{ascending:false});
-  document.getElementById("recipeCount").textContent=`${(data||[]).length} recipe${(data||[]).length!==1?"s":""} shared`;
-  if(!data||!data.length){
-    grid.innerHTML=`<div class="empty-state"><div class="emoji">${t.e}</div><h3>No recipes that month</h3><p>No recipes were submitted for ${MONTHS[parseInt(m)-1]} ${y}.</p></div>`;
-    return;
-  }
-  grid.innerHTML=data.map(r=>{
-    const mine=currentUser&&currentUser.email===r.submitted_by;
-    return `<div class="recipe-card" onclick="openView('${r.id}')">
-      <div class="card-image">${r.photo_url?`<img src="${esc(r.photo_url)}">`:(t.e)}</div>
-      <div class="card-body">
-        <div class="card-meta">
-          <span class="tag tag-dept">${esc(r.department)}</span>
-          <span class="tag tag-office">📍 ${esc(r.office)}</span>
-          ${mine?"<span class='tag tag-mine'>✏️ Mine</span>":""}
-          ${r.is_top20?"<span class='tag tag-top20'>⭐ Top 20</span>":""}
-        </div>
-        <div class="card-title">${esc(r.recipe_name)}</div>
-        <div class="card-author">by ${esc(r.name)}</div>
-        ${r.origin?`<div class="card-origin">${esc(r.origin)}</div>`:""}
-      </div>
-      <div class="card-footer">
-        <span class="comment-count">💬 <span id="cc-${r.id}">…</span></span>
-        <button class="view-btn">View Recipe →</button>
-      </div>
-    </div>`;
-  }).join("");
-  data.forEach(r=>loadCCount(r.id));
-  // Also push these into recipes array so openView works
-  data.forEach(r=>{ if(!recipes.find(x=>x.id===r.id)) recipes.push(r); });
-}
-// ── RATINGS ──
-async function loadRatings(recipeId){
-  const {data}=await db.from("ratings").select("stars").eq("recipe_id",recipeId);
-  const avgEl=document.getElementById("avgStars");
-  const lblEl=document.getElementById("avgLabel");
-  const inputEl=document.getElementById("ratingInput");
-  if(!data||!data.length){
-    avgEl.innerHTML="<span style='opacity:0.2'>☆☆☆☆☆</span>";
-    lblEl.innerHTML="<span style='color:rgba(255,255,255,0.4)'>No ratings yet — be the first!</span>";
-  } else {
-    const avg=(data.reduce((s,r)=>s+r.stars,0)/data.length).toFixed(1);
-    const full=Math.round(avg);
-    avgEl.innerHTML=[1,2,3,4,5].map(i=>`<span style="font-size:22px;opacity:${i<=full?1:0.2}">⭐</span>`).join("");
-    lblEl.innerHTML=`<strong>${avg}</strong> / 5 &nbsp;·&nbsp; ${data.length} rating${data.length!==1?"s":""}`;
-  }
-  if(!currentUser){
-    inputEl.innerHTML=`<div class="rate-note">⭐ <a onclick="openSignIn()">Sign in</a> with your HUB email to rate this recipe.</div>`;
-    return;
-  }
-  const {data:my}=await db.from("ratings").select("stars").eq("recipe_id",recipeId).eq("user_email",currentUser.email).maybeSingle();
-  if(my){
-    const filled="⭐".repeat(my.stars)+"<span style='opacity:0.2'>☆</span>".repeat(5-my.stars);
-    inputEl.innerHTML=`<div class="already-rated">${filled}&nbsp; You rated this ${my.stars}/5 &nbsp;·&nbsp; <a style="color:var(--electric-blue);cursor:pointer;" onclick="clearRating('${recipeId}')">Change</a></div>`;
-  } else {
-    inputEl.innerHTML=`<p style="font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:8px;">Tap a star to rate:</p><div class="star-input">${[5,4,3,2,1].map(n=>`<input type="radio" name="starPick" id="s${n}" value="${n}"><label for="s${n}" onclick="submitRating('${recipeId}',${n})">★</label>`).join("")}</div>`;
-  }
-}
-async function submitRating(recipeId,stars){
-  if(!currentUser){openSignIn();return;}
-  await db.from("ratings").upsert({recipe_id:recipeId,user_email:currentUser.email,stars},{onConflict:"recipe_id,user_email"});
-  showToast(`You rated this ${"⭐".repeat(stars)} (${stars}/5)!`);
-  await loadRatings(recipeId);
-}
-async function clearRating(recipeId){
-  if(!currentUser) return;
-  await db.from("ratings").delete().eq("recipe_id",recipeId).eq("user_email",currentUser.email);
-  showToast("Rating removed");
-  await loadRatings(recipeId);
-}
-// ── UTILS ──
-function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function fd(iso){return new Date(iso).toLocaleDateString('en-CA',{year:'numeric',month:'short',day:'numeric'});}
-let toastT;
-function showToast(msg,err=false){
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.className='toast'+(err?' error':'')+' show';
-  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),3500);
-}
-
-// Backdrop close
-['submitModal','viewModal','signInModal','adminLoginModal'].forEach(id=>{
-  document.getElementById(id).addEventListener('click',e=>{
-    if(e.target.id===id){
-      if(id==='submitModal') closeSubmit();
-      else if(id==='viewModal') closeView();
-      else if(id==='signInModal') closeSignIn();
-      else closeAdminLogin();
-    }
-  });
-});
-
-// ── SUPABASE SQL NOTE ──
-// CREATE RATINGS TABLE:
-// create table ratings (
-//   id uuid default gen_random_uuid() primary key,
-//   recipe_id uuid references recipes(id) on delete cascade,
-//   user_email text not null,
-//   stars integer not null check (stars between 1 and 5),
-//   created_at timestamptz default now(),
-//   unique(recipe_id, user_email)
-// );
-// alter table ratings enable row level security;
-// create policy "Allow all" on ratings for all using (true) with check (true);
-// If you haven't already, add the is_top20 and submitted_by columns:
-// ALTER TABLE recipes ADD COLUMN IF NOT EXISTS is_top20 boolean DEFAULT false;
-// ALTER TABLE recipes ADD COLUMN IF NOT EXISTS submitted_by text;
+})();
 </script>
 </body>
 </html>
